@@ -23,6 +23,23 @@ export const columns: ColumnDef<WatchMarket>[] = [
 
   {
     header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={columnTitleMapping['ltpc.cp-t']} />
+    ),
+    accessorFn: (row) => row.ltpc?.cp,
+    id: 'ltpc.cp-t',
+    cell: ({ row }) => {
+      const currentPrice = row.getValue<number>('ltpc.ltp');
+      const closePrice = row.getValue<number>('ltpc.cp');
+      if (currentPrice && closePrice) {
+        const percentageChange = ((currentPrice - closePrice) / closePrice) * 100;
+        return <div>{percentageChange.toFixed(2)}%</div>;
+      }
+      return <div>{closePrice}</div>;
+    },
+  },
+
+  {
+    header: ({ column }) => (
       <DataTableColumnHeader column={column} title={columnTitleMapping['ltpc.ltp']} />
     ),
     accessorFn: (row) => row.ltpc?.ltp,

@@ -7,6 +7,8 @@ export const columnTitleMapping: Record<string, string> = {
     'ltpc.ltq': 'Last Traded Quantity',
     'ltpc.cp': 'Close Price',
 
+    'ltpc.cp-t':"Change Percentage",
+
     'marketLevel.bidAskQuote': 'Bid/Ask Quote',
     'marketLevel.bidAskQuote.bq': 'Bid Quantity',
     'marketLevel.bidAskQuote.bp': 'Bid Price',
