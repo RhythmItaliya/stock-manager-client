@@ -57,7 +57,7 @@ export interface Ltpc {
   ltp: number // Last traded price
   ltt: string // Last traded time (timestamp)
   ltq: string // Last traded quantity
-  cp: number // Change percentage
+  cp: number // Close Price
 }
 
 export interface WatchMarket {

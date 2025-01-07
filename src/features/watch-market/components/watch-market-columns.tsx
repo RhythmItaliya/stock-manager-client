@@ -4,9 +4,9 @@ import { BidAskQuote, OHLC, OptionGreeks, WatchMarket } from '../data/types'
 import { DataTableColumnHeader } from './data-table-column-header'
 import DataDialog from './data-table-dialog'
 import { DataTableRowActions } from './data-table-row-actions'
-import { usePriceChange } from '../context/usePriceChange'
 import { formatDate, formatTime } from '../utilities/formatTimestamp'
 import { columnTitleMapping } from '../utilities/columnTitleMapping'
+import { usePriceChangeIcon, usePriceChangeText } from '../context/useChange'
 
 export const columns: ColumnDef<WatchMarket>[] = [
   {
@@ -15,7 +15,7 @@ export const columns: ColumnDef<WatchMarket>[] = [
       <DataTableColumnHeader column={column} title={columnTitleMapping['displayName']} />
     ),
     cell: ({ row }) => (
-      <LongText className='max-w-36'>
+      <LongText className='max-w-36 font-medium'>
         {row.getValue<string>('displayName')}
       </LongText>
     ),
@@ -29,47 +29,80 @@ export const columns: ColumnDef<WatchMarket>[] = [
     id: 'ltpc.ltp',
     cell: ({ row }) => {
       const currentPrice = row.getValue<number>('ltpc.ltp');
-      const priceChange = usePriceChange(currentPrice);
-      const priceColor =
-        priceChange === 'up' ? 'text-green-500' : priceChange === 'down' ? 'text-red-500' : '';
-
-      return <div className={priceColor}>{currentPrice}</div>;
+      const { className } = usePriceChangeText(currentPrice);
+      const iconChange = usePriceChangeIcon(currentPrice);
+      return (
+        <div className={className}>
+          {iconChange && <span>{iconChange}</span>}
+          {currentPrice}
+        </div>
+      );
     },
   },
 
   {
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title={columnTitleMapping['ltpc.date']} />
+      <DataTableColumnHeader column={column} title={columnTitleMapping['marketLevel.bidAskQuote.bp']} />
     ),
-    accessorFn: (row) => row.ltpc?.ltt,
-    id: 'ltpc.date',
+    accessorFn: (row) => row.marketLevel?.bidAskQuote?.[0]?.bp,
+    id: 'marketLevel.bidAskQuote.bp',
     cell: ({ row }) => {
-      const rawTimestamp = row.getValue<string>('ltpc.date');
-      const formattedDate = formatDate(rawTimestamp);
-      return <div>{formattedDate}</div>;
+      const currentPrice = row.getValue<number>('marketLevel.bidAskQuote.bp');
+      const { className } = usePriceChangeText(currentPrice);
+      const iconChange = usePriceChangeIcon(currentPrice);
+      return (
+        <div className={className}>
+          {iconChange && <span>{iconChange}</span>}
+          {currentPrice}
+        </div>
+      );
     },
   },
 
   {
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title={columnTitleMapping['ltpc.time']} />
+      <DataTableColumnHeader column={column} title={columnTitleMapping['marketLevel.bidAskQuote.ap']} />
     ),
-    accessorFn: (row) => row.ltpc?.ltt,
-    id: 'ltpc.time',
+    accessorFn: (row) => row.marketLevel?.bidAskQuote?.[0]?.ap,
+    id: 'marketLevel.bidAskQuote.ap',
     cell: ({ row }) => {
-      const rawTimestamp = row.getValue<string>('ltpc.time');
-      const formattedTime = formatTime(rawTimestamp);
-      return <div>{formattedTime}</div>;
+      const currentPrice = row.getValue<number>('marketLevel.bidAskQuote.ap');
+      const { className } = usePriceChangeText(currentPrice);
+      const iconChange = usePriceChangeIcon(currentPrice);
+      return (
+        <div className={className}>
+          {iconChange && <span>{iconChange}</span>}
+          {currentPrice}
+        </div>
+      );
     },
   },
 
   {
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title={columnTitleMapping['ltpc.ltq']} />
+      <DataTableColumnHeader column={column} title={columnTitleMapping['marketOHLC.ohlc.open']} />
     ),
-    accessorFn: (row) => row.ltpc?.ltq,
-    id: 'ltpc.ltq',
-    cell: ({ row }) => <div>{row.getValue<string>('ltpc.ltq')}</div>,
+    accessorFn: (row) => row.marketOHLC?.ohlc?.[0]?.open,
+    id: 'marketOHLC.open',
+    cell: ({ row }) => <div>{row.getValue<number>('marketOHLC.open')}</div>
+  },
+
+  {
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={columnTitleMapping['marketOHLC.ohlc.high']} />
+    ),
+    accessorFn: (row) => row.marketOHLC?.ohlc?.[0]?.high,
+    id: 'marketOHLC.high',
+    cell: ({ row }) => <div>{row.getValue<number>('marketOHLC.high')}</div>
+  },
+
+  {
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={columnTitleMapping['marketOHLC.ohlc.low']} />
+    ),
+    accessorFn: (row) => row.marketOHLC?.ohlc?.[0]?.low,
+    id: 'marketOHLC.low',
+    cell: ({ row }) => <div>{row.getValue<number>('marketOHLC.low')}</div>
   },
 
   {
@@ -78,7 +111,7 @@ export const columns: ColumnDef<WatchMarket>[] = [
     ),
     accessorFn: (row) => row.ltpc?.cp,
     id: 'ltpc.cp',
-    cell: ({ row }) => <div>{row.getValue<number>('ltpc.cp')}%</div>,
+    cell: ({ row }) => <div>{row.getValue<number>('ltpc.cp')}</div>,
   },
 
   {
@@ -86,6 +119,7 @@ export const columns: ColumnDef<WatchMarket>[] = [
       <DataTableColumnHeader column={column} title={columnTitleMapping['marketLevel.bidAskQuote']} />
     ),
     accessorFn: (row) => row.marketLevel?.bidAskQuote,
+    enableSorting: false,
     id: 'marketLevel.bidAskQuote',
     cell: ({ row }) => {
       const bidAskQuote = row.getValue<BidAskQuote[]>('marketLevel.bidAskQuote')
@@ -96,8 +130,6 @@ export const columns: ColumnDef<WatchMarket>[] = [
         { key: 'aq', title: columnTitleMapping['marketLevel.bidAskQuote.aq'] },
         { key: 'ap', title: columnTitleMapping['marketLevel.bidAskQuote.ap'] },
         { key: 'ano', title: columnTitleMapping['marketLevel.bidAskQuote.ano'] },
-        { key: 'bidQ', title: columnTitleMapping['marketLevel.bidAskQuote.bidQ'] },
-        { key: 'askQ', title: columnTitleMapping['marketLevel.bidAskQuote.askQ'] },
       ];
       return (
         <DataDialog title={columnTitleMapping['marketLevel.bidAskQuote']} data={bidAskQuote} headers={headers} />
@@ -107,34 +139,10 @@ export const columns: ColumnDef<WatchMarket>[] = [
 
   {
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title={columnTitleMapping['optionGreeks']} />
-    ),
-    accessorFn: (row) => row.optionGreeks,
-    id: 'optionGreeks',
-    cell: ({ row }) => {
-      const optionGreeks = row.getValue<OptionGreeks>('optionGreeks');
-
-      const headers = [
-        { key: 'op', title: columnTitleMapping['optionGreeks.op'] },
-        { key: 'up', title: columnTitleMapping['optionGreeks.up'] },
-        { key: 'iv', title: columnTitleMapping['optionGreeks.iv'] },
-        { key: 'delta', title: columnTitleMapping['optionGreeks.delta'] },
-        { key: 'theta', title: columnTitleMapping['optionGreeks.theta'] },
-        { key: 'gamma', title: columnTitleMapping['optionGreeks.gamma'] },
-        { key: 'vega', title: columnTitleMapping['optionGreeks.vega'] },
-        { key: 'rho', title: columnTitleMapping['optionGreeks.rho'] },
-      ];
-      return (
-        <DataDialog title={columnTitleMapping['optionGreeks']} data={[optionGreeks]} headers={headers} />
-      );
-    },
-  },
-
-  {
-    header: ({ column }) => (
       <DataTableColumnHeader column={column} title={columnTitleMapping['marketOHLC.ohlc']} />
     ),
     accessorFn: (row) => row.marketOHLC?.ohlc,
+    enableSorting: false,
     id: 'marketOHLC.ohlc',
     cell: ({ row }) => {
       const ohlcData = row.getValue<OHLC[]>('marketOHLC.ohlc');
@@ -159,6 +167,7 @@ export const columns: ColumnDef<WatchMarket>[] = [
       <DataTableColumnHeader column={column} title={columnTitleMapping['eFeedDetails']} />
     ),
     accessorFn: (row) => row.eFeedDetails,
+    enableSorting: false,
     id: 'eFeedDetails',
     cell: ({ row }) => {
       const eFeedDetailsData = row.getValue<any>('eFeedDetails');
@@ -185,6 +194,57 @@ export const columns: ColumnDef<WatchMarket>[] = [
           headers={headers}
         />
       );
+    },
+  },
+
+  {
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={columnTitleMapping['optionGreeks']} />
+    ),
+    accessorFn: (row) => row.optionGreeks,
+    enableSorting: false,
+    id: 'optionGreeks',
+    cell: ({ row }) => {
+      const optionGreeks = row.getValue<OptionGreeks>('optionGreeks');
+      const headers = [
+        { key: 'op', title: columnTitleMapping['optionGreeks.op'] },
+        { key: 'up', title: columnTitleMapping['optionGreeks.up'] },
+        { key: 'iv', title: columnTitleMapping['optionGreeks.iv'] },
+        { key: 'delta', title: columnTitleMapping['optionGreeks.delta'] },
+        { key: 'theta', title: columnTitleMapping['optionGreeks.theta'] },
+        { key: 'gamma', title: columnTitleMapping['optionGreeks.gamma'] },
+        { key: 'vega', title: columnTitleMapping['optionGreeks.vega'] },
+        { key: 'rho', title: columnTitleMapping['optionGreeks.rho'] },
+      ];
+      return (
+        <DataDialog title={columnTitleMapping['optionGreeks']} data={[optionGreeks]} headers={headers} />
+      );
+    },
+  },
+
+  {
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={columnTitleMapping['ltpc.date']} />
+    ),
+    accessorFn: (row) => row.ltpc?.ltt,
+    id: 'ltpc.date',
+    cell: ({ row }) => {
+      const rawTimestamp = row.getValue<string>('ltpc.date');
+      const formattedDate = formatDate(rawTimestamp);
+      return <div>{formattedDate}</div>;
+    },
+  },
+
+  {
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={columnTitleMapping['ltpc.time']} />
+    ),
+    accessorFn: (row) => row.ltpc?.ltt,
+    id: 'ltpc.time',
+    cell: ({ row }) => {
+      const rawTimestamp = row.getValue<string>('ltpc.time');
+      const formattedTime = formatTime(rawTimestamp);
+      return <div>{formattedTime}</div>;
     },
   },
 

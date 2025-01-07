@@ -5,7 +5,7 @@ export const columnTitleMapping: Record<string, string> = {
     'ltpc.date': 'Last Traded Date',
     'ltpc.time': 'Last Traded Time',
     'ltpc.ltq': 'Last Traded Quantity',
-    'ltpc.cp': 'Change Percentage',
+    'ltpc.cp': 'Close Price',
 
     'marketLevel.bidAskQuote': 'Bid/Ask Quote',
     'marketLevel.bidAskQuote.bq': 'Bid Quantity',
@@ -36,6 +36,10 @@ export const columnTitleMapping: Record<string, string> = {
     'marketOHLC.ohlc.volume': 'Volume',
     'marketOHLC.ohlc.ts': 'Timestamp',
     'marketOHLC.ohlc.vol': 'Volume (Alternative)',
+
+    'marketOHLC.open': 'Open Price',
+    'marketOHLC.high': 'High Price',
+    'marketOHLC.low': 'Low Price',
 
     'eFeedDetails': 'E-Feed Details',
     'eFeedDetails.atp': 'Average Traded Price (ATP)',
