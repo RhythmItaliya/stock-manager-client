@@ -70,7 +70,7 @@ export interface WatchMarket {
   eFeedDetails: EFeedDetails // eFeed related data
 }
 
-export type PriceChange = 'up' | 'down' | 'same';
+export type PriceChange = 'up' | 'down' | 'same'
 
 // open
 // close

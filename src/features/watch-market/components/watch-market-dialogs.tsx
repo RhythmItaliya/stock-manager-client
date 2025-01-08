@@ -1,8 +1,14 @@
 import { useWatchMarkets } from '../context/watch-market-context'
+import { WatchMarket } from '../data/types'
 import { WatchMarketsDeleteDialog } from './watch-market-delete-dialog'
 
-export function WatchMarketsDialogs() {
+export function WatchMarketsDialogs({
+  onDeleteSuccess,
+}: {
+  onDeleteSuccess: (deletedMarket: WatchMarket) => void
+}) {
   const { open, setOpen, currentRow, setCurrentRow } = useWatchMarkets()
+
   return (
     <>
       {currentRow && (
@@ -17,6 +23,7 @@ export function WatchMarketsDialogs() {
               }, 500)
             }}
             currentRow={currentRow}
+            onDeleteSuccess={onDeleteSuccess}
           />
         </>
       )}

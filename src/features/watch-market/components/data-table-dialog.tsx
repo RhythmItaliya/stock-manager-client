@@ -30,19 +30,19 @@ const DataDialog: React.FC<DialogTableProps> = ({ title, data, headers }) => {
 
   const renderCell = (cell: any, key: string) => {
     if (key === 'bp' || key === 'ap' || key === 'high' || key === 'low') {
-      const { className } = usePriceChangeText(cell);
-      const iconChange = usePriceChangeIcon(cell);
+      const { className } = usePriceChangeText(cell)
+      const iconChange = usePriceChangeIcon(cell)
       return (
         <div className={className}>
           {iconChange && <span>{iconChange}</span>}
           {cell}
         </div>
-      );
+      )
     }
     if (typeof cell === 'object' && cell !== null) {
-      return JSON.stringify(cell);
+      return JSON.stringify(cell)
     }
-    return cell;
+    return cell
   }
 
   return (

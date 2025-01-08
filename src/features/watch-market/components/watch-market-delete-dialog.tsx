@@ -4,38 +4,43 @@ import { useState } from 'react'
 import { IconAlertTriangle } from '@tabler/icons-react'
 import { toast } from '@/hooks/use-toast'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { ConfirmDialog } from '@/components/confirm-dialog'
+import { deleteInstrumentKey } from '../../../api/api.marketFeed'
 import { WatchMarket } from '../data/schema'
 
 interface Props {
   open: boolean
   onOpenChange: (open: boolean) => void
   currentRow: WatchMarket
+  onDeleteSuccess: (deletedMarket: WatchMarket) => void
 }
 
 export function WatchMarketsDeleteDialog({
   open,
   onOpenChange,
   currentRow,
+  onDeleteSuccess,
 }: Props) {
-  const [value, setValue] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
-  const handleDelete = () => {
-    if (value.trim() !== currentRow.displayName) return
-
-    onOpenChange(false)
-    toast({
-      title: 'The following WatchMarket has been deleted:',
-      description: (
-        <pre className='mt-2 w-[340px] rounded-md bg-slate-950 p-4'>
-          <code className='text-white'>
-            {JSON.stringify(currentRow, null, 2)}
-          </code>
-        </pre>
-      ),
-    })
+  const handleDelete = async () => {
+    setIsLoading(true)
+    try {
+      await deleteInstrumentKey([currentRow.displayName])
+      onOpenChange(false)
+      onDeleteSuccess(currentRow)
+      toast({
+        title: `The following WatchMarket has been deleted: ${currentRow.displayName}`,
+      })
+    } catch (error) {
+      toast({
+        title: 'Error deleting WatchMarket',
+        description: 'Something went wrong while deleting the item.',
+        variant: 'destructive',
+      })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -43,7 +48,9 @@ export function WatchMarketsDeleteDialog({
       open={open}
       onOpenChange={onOpenChange}
       handleConfirm={handleDelete}
-      disabled={value.trim() !== currentRow.displayName}
+      confirmText='Delete'
+      destructive
+      isLoading={isLoading}
       title={
         <span className='text-destructive'>
           <IconAlertTriangle
@@ -57,28 +64,17 @@ export function WatchMarketsDeleteDialog({
         <div className='space-y-4'>
           <p className='mb-2'>
             Are you sure you want to delete{' '}
-            <span className='font-bold'>{currentRow.displayName}</span>
+            <span className='font-bold'>{currentRow.displayName}</span> ?
           </p>
-
-          <Label className='my-2'>
-            DisplayName:
-            <Input
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              placeholder='Enter DisplayName to confirm deletion.'
-            />
-          </Label>
 
           <Alert variant='destructive'>
             <AlertTitle>Warning!</AlertTitle>
             <AlertDescription>
-              Please be carefull, this operation can not be rolled back.
+              Please be careful, this operation cannot be rolled back.
             </AlertDescription>
           </Alert>
         </div>
       }
-      confirmText='Delete'
-      destructive
     />
   )
 }

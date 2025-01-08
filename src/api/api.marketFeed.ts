@@ -1,5 +1,7 @@
+// api.marketFeed.ts
 import protobuf from 'protobufjs'
 import { io, Socket } from 'socket.io-client'
+import { ApiConfig, getUserId } from '@/api/api.config'
 
 type FeedResponseType = {
   feeds: Record<string, any>
@@ -11,7 +13,6 @@ class MarketApi {
   private subscribers: ((data: FeedResponseType) => void)[] = []
 
   constructor() {
-    // Load Protobuf schema
     protobuf.load('MarketDataFeed.proto', (err, root) => {
       if (err) {
         console.error('Error loading Protobuf:', err)
@@ -25,8 +26,16 @@ class MarketApi {
   connect(url: string) {
     this.socket = io.connect(url)
 
-    this.socket.on('connect', () => {
+    this.socket.on('connect', async () => {
       console.log('WebSocket connected')
+
+      const userId = 'user123'
+      try {
+        const subscriptionData = await getSubscription(userId)
+        console.log('Subscription data:', subscriptionData)
+      } catch (error) {
+        console.error('Error fetching subscription data on connect:', error)
+      }
     })
 
     this.socket.on('disconnect', () => {
@@ -77,3 +86,55 @@ class MarketApi {
 
 const marketApi = new MarketApi()
 export default marketApi
+
+export const postSubscription = async (
+  userId: string,
+  instrumentKeys: string[]
+) => {
+  try {
+    const response = await ApiConfig.post('/subscribe', {
+      userId,
+      instrumentKeys,
+    })
+    return response.data
+  } catch (error) {
+    console.error('Error subscribing to instruments:', error)
+    throw error
+  }
+}
+
+export const getSubscription = async (userId: string) => {
+  try {
+    const response = await ApiConfig.get(`/subscribe/${userId}`)
+    return response.data
+  } catch (error) {
+    console.error('Error fetching subscription:', error)
+    throw error
+  }
+}
+
+export const deleteAllSubscription = async (userId: string) => {
+  try {
+    const response = await ApiConfig.delete(`/subscribe/${userId}`)
+    return response.data
+  } catch (error) {
+    console.error('Error deleting all subscribe:', error)
+    throw error
+  }
+}
+
+export const deleteInstrumentKey = async (
+  instrumentKeys: string[]
+): Promise<void> => {
+  const userId = getUserId()
+  try {
+    const response = await ApiConfig.delete(
+      `/subscribe/${userId}/instruments`,
+      { data: { instrumentKeys } }
+    )
+    return response.data
+  } catch (error) {
+    console.error('Error deleting instrument keys:', error)
+    throw error
+  }
+}

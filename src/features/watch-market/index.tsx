@@ -4,7 +4,7 @@ import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
-import marketApi from './api/marketApi'
+import marketApi from '../../api/api.marketFeed'
 import { columns } from './components/watch-market-columns'
 import { WatchMarketsDialogs } from './components/watch-market-dialogs'
 import { WatchMarketsPrimaryButtons } from './components/watch-market-primary-buttons'
@@ -16,9 +16,11 @@ import WatchMarketsData from './data/watch-market'
 
 export default function WatchMarkets() {
   const [watchMarketList, setWatchMarketList] = useState<WatchMarket[]>([])
+  const [loading, setLoading] = useState<boolean>(false)
 
   useEffect(() => {
     const handleMarketData = (decodedMessage: any) => {
+      setLoading(true)
       try {
         const transformedData = WatchMarketsData(decodedMessage.feeds || {})
         WatchMarketsListSchema.parse(transformedData)
@@ -39,6 +41,8 @@ export default function WatchMarkets() {
         })
       } catch (error) {
         console.error('Error while validating the data:', error)
+      } finally {
+        setLoading(false)
       }
     }
 
@@ -50,6 +54,12 @@ export default function WatchMarkets() {
       marketApi.disconnect()
     }
   }, [])
+
+  const handleDeleteSuccess = (deletedMarket: WatchMarket) => {
+    setWatchMarketList((prevList) =>
+      prevList.filter((market) => market.id !== deletedMarket.id)
+    )
+  }
 
   return (
     <WatchMarketProvider>
@@ -74,11 +84,15 @@ export default function WatchMarkets() {
           <WatchMarketsPrimaryButtons />
         </div>
         <div className='-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-x-12 lg:space-y-0'>
-          <WatchMarketsTable data={watchMarketList} columns={columns} />
+          <WatchMarketsTable
+            data={watchMarketList}
+            columns={columns}
+            loading={loading}
+          />
         </div>
       </Main>
 
-      <WatchMarketsDialogs />
+      <WatchMarketsDialogs onDeleteSuccess={handleDeleteSuccess} />
     </WatchMarketProvider>
   )
 }
