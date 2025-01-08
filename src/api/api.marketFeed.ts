@@ -123,10 +123,8 @@ export const deleteAllSubscription = async (userId: string) => {
   }
 }
 
-export const deleteInstrumentKey = async (
-  instrumentKeys: string[]
-): Promise<void> => {
-  const userId = getUserId()
+export const deleteInstrumentKey = async (instrumentKeys: string[]): Promise<any> => {
+  const userId = "user123"
   try {
     const response = await ApiConfig.delete(
       `/subscribe/${userId}/instruments`,
