@@ -3,7 +3,8 @@ import { Cross2Icon, PlusCircledIcon } from '@radix-ui/react-icons'
 import { Table } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { AddStockDialog } from './data--add-Dialog'
+import { AddStockDialog } from './data-add-stock-Dialog'
+import { AddMarketNameDialog } from './data-list-market-name'
 import { DataTableViewOptions } from './data-table-view-options'
 
 interface DataTableToolbarProps<TData> {
@@ -14,6 +15,7 @@ export function DataTableToolbar<TData>({
   table,
 }: DataTableToolbarProps<TData>) {
   const [isDialogOpen, setDialogOpen] = useState(false)
+  const [isMarketWatchDialogOpen, setMarketWatchDialogOpen] = useState(false)
   const isFiltered = table.getState().columnFilters.length > 0
 
   const handleAddClick = () => {
@@ -22,6 +24,14 @@ export function DataTableToolbar<TData>({
 
   const handleDialogClose = () => {
     setDialogOpen(false)
+  }
+
+  const handleMarketWatchDialogOpen = () => {
+    setMarketWatchDialogOpen(true)
+  }
+
+  const handleMarketWatchDialogClose = () => {
+    setMarketWatchDialogOpen(false)
   }
 
   return (
@@ -48,7 +58,7 @@ export function DataTableToolbar<TData>({
 
         <Button
           variant='ghost'
-          onClick={handleAddClick}
+          onClick={handleMarketWatchDialogOpen}
           className='h-8 px-2 lg:px-3'
         >
           <PlusCircledIcon className='ml-2 h-4 w-4' />
@@ -67,7 +77,12 @@ export function DataTableToolbar<TData>({
         )}
       </div>
       <DataTableViewOptions table={table} />
+
       <AddStockDialog isOpen={isDialogOpen} onClose={handleDialogClose} />
+      <AddMarketNameDialog
+        isOpen={isMarketWatchDialogOpen}
+        onClose={handleMarketWatchDialogClose}
+      />
     </div>
   )
 }

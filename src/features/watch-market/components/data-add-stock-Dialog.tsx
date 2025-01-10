@@ -37,7 +37,7 @@ export function AddStockDialog({ isOpen, onClose }: AddStockDialogProps) {
           />
 
           <Input
-            placeholder='Search stock...'
+            placeholder='Search market...'
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className='pl-10 pr-12 h-9 w-full rounded-md text-sm'
