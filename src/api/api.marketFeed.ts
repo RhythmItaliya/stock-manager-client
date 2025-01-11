@@ -92,7 +92,7 @@ export const postSubscription = async (
   instrumentKeys: string[]
 ) => {
   try {
-    const response = await ApiConfig.post('/subscribe', {
+    const response = await ApiConfig.post('/market-feed', {
       userId,
       instrumentKeys,
     })
@@ -105,7 +105,7 @@ export const postSubscription = async (
 
 export const getSubscription = async (userId: string) => {
   try {
-    const response = await ApiConfig.get(`/subscribe/${userId}`)
+    const response = await ApiConfig.get(`/market-feed/${userId}`)
     return response.data
   } catch (error) {
     console.error('Error fetching subscription:', error)
@@ -115,7 +115,7 @@ export const getSubscription = async (userId: string) => {
 
 export const deleteAllSubscription = async (userId: string) => {
   try {
-    const response = await ApiConfig.delete(`/subscribe/${userId}`)
+    const response = await ApiConfig.delete(`/market-feed/${userId}`)
     return response.data
   } catch (error) {
     console.error('Error deleting all subscribe:', error)
@@ -129,7 +129,7 @@ export const deleteInstrumentKey = async (
   const userId = 'user123'
   try {
     const response = await ApiConfig.delete(
-      `/subscribe/${userId}/instruments`,
+      `/market-feed/${userId}/instruments`,
       { data: { instrumentKeys } }
     )
     return response.data
