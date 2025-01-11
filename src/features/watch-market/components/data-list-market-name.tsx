@@ -162,7 +162,8 @@ export function AddMarketNameDialog({
               ? { ...s, isDefault: true }
               : { ...s, isDefault: false }
           )
-        )
+        );
+        onClose()
       }
     } catch (error) {
       console.error('Error setting market watch as default:', error)
