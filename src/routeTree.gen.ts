@@ -61,6 +61,9 @@ const AuthenticatedSettingsNotificationsLazyImport = createFileRoute(
 const AuthenticatedSettingsDisplayLazyImport = createFileRoute(
   '/_authenticated/settings/display',
 )()
+const AuthenticatedSettingsCsvUploadLazyImport = createFileRoute(
+  '/_authenticated/settings/csv-upload',
+)()
 const AuthenticatedSettingsAppearanceLazyImport = createFileRoute(
   '/_authenticated/settings/appearance',
 )()
@@ -264,6 +267,17 @@ const AuthenticatedSettingsDisplayLazyRoute =
     ),
   )
 
+const AuthenticatedSettingsCsvUploadLazyRoute =
+  AuthenticatedSettingsCsvUploadLazyImport.update({
+    id: '/csv-upload',
+    path: '/csv-upload',
+    getParentRoute: () => AuthenticatedSettingsRouteLazyRoute,
+  } as any).lazy(() =>
+    import('./routes/_authenticated/settings/csv-upload.lazy').then(
+      (d) => d.Route,
+    ),
+  )
+
 const AuthenticatedSettingsAppearanceLazyRoute =
   AuthenticatedSettingsAppearanceLazyImport.update({
     id: '/appearance',
@@ -402,6 +416,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsAppearanceLazyImport
       parentRoute: typeof AuthenticatedSettingsRouteLazyImport
     }
+    '/_authenticated/settings/csv-upload': {
+      id: '/_authenticated/settings/csv-upload'
+      path: '/csv-upload'
+      fullPath: '/settings/csv-upload'
+      preLoaderRoute: typeof AuthenticatedSettingsCsvUploadLazyImport
+      parentRoute: typeof AuthenticatedSettingsRouteLazyImport
+    }
     '/_authenticated/settings/display': {
       id: '/_authenticated/settings/display'
       path: '/display'
@@ -473,23 +494,26 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedSettingsRouteLazyRouteChildren {
   AuthenticatedSettingsAccountLazyRoute: typeof AuthenticatedSettingsAccountLazyRoute
   AuthenticatedSettingsAppearanceLazyRoute: typeof AuthenticatedSettingsAppearanceLazyRoute
+  AuthenticatedSettingsCsvUploadLazyRoute: typeof AuthenticatedSettingsCsvUploadLazyRoute
   AuthenticatedSettingsDisplayLazyRoute: typeof AuthenticatedSettingsDisplayLazyRoute
   AuthenticatedSettingsNotificationsLazyRoute: typeof AuthenticatedSettingsNotificationsLazyRoute
   AuthenticatedSettingsIndexLazyRoute: typeof AuthenticatedSettingsIndexLazyRoute
 }
 
 const AuthenticatedSettingsRouteLazyRouteChildren: AuthenticatedSettingsRouteLazyRouteChildren =
-{
-  AuthenticatedSettingsAccountLazyRoute:
-    AuthenticatedSettingsAccountLazyRoute,
-  AuthenticatedSettingsAppearanceLazyRoute:
-    AuthenticatedSettingsAppearanceLazyRoute,
-  AuthenticatedSettingsDisplayLazyRoute:
-    AuthenticatedSettingsDisplayLazyRoute,
-  AuthenticatedSettingsNotificationsLazyRoute:
-    AuthenticatedSettingsNotificationsLazyRoute,
-  AuthenticatedSettingsIndexLazyRoute: AuthenticatedSettingsIndexLazyRoute,
-}
+  {
+    AuthenticatedSettingsAccountLazyRoute:
+      AuthenticatedSettingsAccountLazyRoute,
+    AuthenticatedSettingsAppearanceLazyRoute:
+      AuthenticatedSettingsAppearanceLazyRoute,
+    AuthenticatedSettingsCsvUploadLazyRoute:
+      AuthenticatedSettingsCsvUploadLazyRoute,
+    AuthenticatedSettingsDisplayLazyRoute:
+      AuthenticatedSettingsDisplayLazyRoute,
+    AuthenticatedSettingsNotificationsLazyRoute:
+      AuthenticatedSettingsNotificationsLazyRoute,
+    AuthenticatedSettingsIndexLazyRoute: AuthenticatedSettingsIndexLazyRoute,
+  }
 
 const AuthenticatedSettingsRouteLazyRouteWithChildren =
   AuthenticatedSettingsRouteLazyRoute._addFileChildren(
@@ -539,6 +563,7 @@ export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/settings/account': typeof AuthenticatedSettingsAccountLazyRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceLazyRoute
+  '/settings/csv-upload': typeof AuthenticatedSettingsCsvUploadLazyRoute
   '/settings/display': typeof AuthenticatedSettingsDisplayLazyRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsLazyRoute
   '/apps': typeof AuthenticatedAppsIndexLazyRoute
@@ -564,6 +589,7 @@ export interface FileRoutesByTo {
   '/': typeof AuthenticatedIndexRoute
   '/settings/account': typeof AuthenticatedSettingsAccountLazyRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceLazyRoute
+  '/settings/csv-upload': typeof AuthenticatedSettingsCsvUploadLazyRoute
   '/settings/display': typeof AuthenticatedSettingsDisplayLazyRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsLazyRoute
   '/apps': typeof AuthenticatedAppsIndexLazyRoute
@@ -593,6 +619,7 @@ export interface FileRoutesById {
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountLazyRoute
   '/_authenticated/settings/appearance': typeof AuthenticatedSettingsAppearanceLazyRoute
+  '/_authenticated/settings/csv-upload': typeof AuthenticatedSettingsCsvUploadLazyRoute
   '/_authenticated/settings/display': typeof AuthenticatedSettingsDisplayLazyRoute
   '/_authenticated/settings/notifications': typeof AuthenticatedSettingsNotificationsLazyRoute
   '/_authenticated/apps/': typeof AuthenticatedAppsIndexLazyRoute
@@ -607,81 +634,84 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-  | ''
-  | '/500'
-  | '/otp'
-  | '/sign-in'
-  | '/settings'
-  | '/forgot-password'
-  | '/sign-in-2'
-  | '/sign-up'
-  | '/401'
-  | '/403'
-  | '/404'
-  | '/503'
-  | '/'
-  | '/settings/account'
-  | '/settings/appearance'
-  | '/settings/display'
-  | '/settings/notifications'
-  | '/apps'
-  | '/chats'
-  | '/help-center'
-  | '/settings/'
-  | '/tasks'
-  | '/users'
-  | '/watch-market'
+    | ''
+    | '/500'
+    | '/otp'
+    | '/sign-in'
+    | '/settings'
+    | '/forgot-password'
+    | '/sign-in-2'
+    | '/sign-up'
+    | '/401'
+    | '/403'
+    | '/404'
+    | '/503'
+    | '/'
+    | '/settings/account'
+    | '/settings/appearance'
+    | '/settings/csv-upload'
+    | '/settings/display'
+    | '/settings/notifications'
+    | '/apps'
+    | '/chats'
+    | '/help-center'
+    | '/settings/'
+    | '/tasks'
+    | '/users'
+    | '/watch-market'
   fileRoutesByTo: FileRoutesByTo
   to:
-  | '/500'
-  | '/otp'
-  | '/sign-in'
-  | '/forgot-password'
-  | '/sign-in-2'
-  | '/sign-up'
-  | '/401'
-  | '/403'
-  | '/404'
-  | '/503'
-  | '/'
-  | '/settings/account'
-  | '/settings/appearance'
-  | '/settings/display'
-  | '/settings/notifications'
-  | '/apps'
-  | '/chats'
-  | '/help-center'
-  | '/settings'
-  | '/tasks'
-  | '/users'
-  | '/watch-market'
+    | '/500'
+    | '/otp'
+    | '/sign-in'
+    | '/forgot-password'
+    | '/sign-in-2'
+    | '/sign-up'
+    | '/401'
+    | '/403'
+    | '/404'
+    | '/503'
+    | '/'
+    | '/settings/account'
+    | '/settings/appearance'
+    | '/settings/csv-upload'
+    | '/settings/display'
+    | '/settings/notifications'
+    | '/apps'
+    | '/chats'
+    | '/help-center'
+    | '/settings'
+    | '/tasks'
+    | '/users'
+    | '/watch-market'
   id:
-  | '__root__'
-  | '/_authenticated'
-  | '/(auth)/500'
-  | '/(auth)/otp'
-  | '/(auth)/sign-in'
-  | '/_authenticated/settings'
-  | '/(auth)/forgot-password'
-  | '/(auth)/sign-in-2'
-  | '/(auth)/sign-up'
-  | '/(errors)/401'
-  | '/(errors)/403'
-  | '/(errors)/404'
-  | '/(errors)/500'
-  | '/(errors)/503'
-  | '/_authenticated/'
-  | '/_authenticated/settings/account'
-  | '/_authenticated/settings/appearance'
-  | '/_authenticated/settings/display'
-  | '/_authenticated/settings/notifications'
-  | '/_authenticated/apps/'
-  | '/_authenticated/chats/'
-  | '/_authenticated/help-center/'
-  | '/_authenticated/settings/'
-  | '/_authenticated/tasks/'
-  | '/_authenticated/users/'
-  | '/_authenticated/watch-market/'
+    | '__root__'
+    | '/_authenticated'
+    | '/(auth)/500'
+    | '/(auth)/otp'
+    | '/(auth)/sign-in'
+    | '/_authenticated/settings'
+    | '/(auth)/forgot-password'
+    | '/(auth)/sign-in-2'
+    | '/(auth)/sign-up'
+    | '/(errors)/401'
+    | '/(errors)/403'
+    | '/(errors)/404'
+    | '/(errors)/500'
+    | '/(errors)/503'
+    | '/_authenticated/'
+    | '/_authenticated/settings/account'
+    | '/_authenticated/settings/appearance'
+    | '/_authenticated/settings/csv-upload'
+    | '/_authenticated/settings/display'
+    | '/_authenticated/settings/notifications'
+    | '/_authenticated/apps/'
+    | '/_authenticated/chats/'
+    | '/_authenticated/help-center/'
+    | '/_authenticated/settings/'
+    | '/_authenticated/tasks/'
+    | '/_authenticated/users/'
+    | '/_authenticated/watch-market/'
   fileRoutesById: FileRoutesById
 }
 
@@ -767,6 +797,7 @@ export const routeTree = rootRoute
       "children": [
         "/_authenticated/settings/account",
         "/_authenticated/settings/appearance",
+        "/_authenticated/settings/csv-upload",
         "/_authenticated/settings/display",
         "/_authenticated/settings/notifications",
         "/_authenticated/settings/"
@@ -806,6 +837,10 @@ export const routeTree = rootRoute
     },
     "/_authenticated/settings/appearance": {
       "filePath": "_authenticated/settings/appearance.lazy.tsx",
+      "parent": "/_authenticated/settings"
+    },
+    "/_authenticated/settings/csv-upload": {
+      "filePath": "_authenticated/settings/csv-upload.lazy.tsx",
       "parent": "/_authenticated/settings"
     },
     "/_authenticated/settings/display": {

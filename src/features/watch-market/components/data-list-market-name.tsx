@@ -162,7 +162,7 @@ export function AddMarketNameDialog({
               ? { ...s, isDefault: true }
               : { ...s, isDefault: false }
           )
-        );
+        )
         onClose()
       }
     } catch (error) {
