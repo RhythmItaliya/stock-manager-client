@@ -73,3 +73,17 @@ export const getMarketWatchNames = async () => {
     throw error
   }
 }
+
+export const setDefaultMarketWatch = async (name: string) => {
+  const userId = getUserId()
+
+  try {
+    const response = await ApiConfig.put(
+      `/marketwatch/${userId}/${name}/set-default`
+    )
+    return response.data
+  } catch (error) {
+    console.error('Error setting MarketWatch as default:', error)
+    throw error
+  }
+}

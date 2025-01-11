@@ -23,6 +23,7 @@ import {
   postMarketWatch,
   deleteMarketWatch,
   getMarketWatchInstruments,
+  setDefaultMarketWatch,
 } from '../../../api/api.marketWatch'
 
 interface AddMarketNameDialogProps {
@@ -33,6 +34,12 @@ interface AddMarketNameDialogProps {
 interface Stock {
   id: string
   name: string
+  isDefault: boolean
+}
+
+interface MarketWatch {
+  name: string
+  isDefaultMarket: boolean
 }
 
 export function AddMarketNameDialog({
@@ -51,13 +58,12 @@ export function AddMarketNameDialog({
       setLoading(true)
       try {
         const response = await getMarketWatchNames()
-        const marketWatchNames = response.data || []
-        const stockList = marketWatchNames.map(
-          (name: string, index: number) => ({
-            id: `${index + 1}`,
-            name,
-          })
-        )
+        const marketWatchNames: MarketWatch[] = response.data || []
+        const stockList = marketWatchNames.map((stock, index) => ({
+          id: `${index + 1}`,
+          name: stock.name,
+          isDefault: stock.isDefaultMarket,
+        }))
         setStocks(stockList)
         setFilteredStocks(stockList)
       } catch (error) {
@@ -66,6 +72,7 @@ export function AddMarketNameDialog({
         setLoading(false)
       }
     }
+
     if (isOpen) {
       fetchMarketWatchNames()
     }
@@ -108,7 +115,11 @@ export function AddMarketNameDialog({
         const response = await postMarketWatch(newMarketName)
         console.log('New market added:', response)
 
-        const newStock = { id: `${stocks.length + 1}`, name: newMarketName }
+        const newStock = {
+          id: `${stocks.length + 1}`,
+          name: newMarketName,
+          isDefault: false,
+        }
         setStocks((prevStocks) => [...prevStocks, newStock])
         setFilteredStocks((prevStocks) => [...prevStocks, newStock])
         setNewMarketName('')
@@ -129,6 +140,32 @@ export function AddMarketNameDialog({
       }
     } catch (error) {
       console.error('Error selecting market watch:', error)
+    }
+  }
+
+  const handleSetDefaultMarketWatch = async (stockId: string) => {
+    try {
+      const stock = stocks.find((stock) => stock.id === stockId)
+      if (stock) {
+        const response = await setDefaultMarketWatch(stock.name)
+        console.log('Market watch set as default:', response)
+        setStocks((prevStocks) =>
+          prevStocks.map((s) =>
+            s.id === stockId
+              ? { ...s, isDefault: true }
+              : { ...s, isDefault: false }
+          )
+        )
+        setFilteredStocks((prevStocks) =>
+          prevStocks.map((s) =>
+            s.id === stockId
+              ? { ...s, isDefault: true }
+              : { ...s, isDefault: false }
+          )
+        )
+      }
+    } catch (error) {
+      console.error('Error setting market watch as default:', error)
     }
   }
 
@@ -190,7 +227,9 @@ export function AddMarketNameDialog({
                 <TableRow>
                   <TableHead className='px-4 py-2'>Market Watch Name</TableHead>
                   <TableHead className='px-4 py-2'>Watch Market</TableHead>
-                  <TableHead className='px-4 py-2'>Actions</TableHead>
+                  <TableHead className='px-4 py-2 text-center'>
+                    Actions
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -207,7 +246,25 @@ export function AddMarketNameDialog({
                         </Button>
                       </TableCell>
 
-                      <TableCell className='px-4 py-2'>
+                      <TableCell className='px-4 py-2 justify-center flex'>
+                        {!stock.isDefault && (
+                          <Button
+                            onClick={() =>
+                              handleSetDefaultMarketWatch(stock.id)
+                            }
+                            variant='secondary'
+                          >
+                            Default
+                          </Button>
+                        )}
+                        {stock.isDefault && (
+                          <Button
+                            variant='secondary'
+                            className='text-green-600'
+                          >
+                            Default
+                          </Button>
+                        )}
                         <Button
                           onClick={() => handleDeleteMarketWatch(stock.id)}
                           variant='link'
