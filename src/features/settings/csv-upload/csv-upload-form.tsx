@@ -108,7 +108,7 @@ export function CSVUploadForm() {
   })
 
   const { isLoading: isUpdating, mutate: updateFile } = useApi({
-    apiCall: updateCsvFile,
+    apiCall: ({ id, file }: { id: string, file: File }) => updateCsvFile(id, file),
     onSuccess: (data) => {
       console.log(data);
       toast({
@@ -133,7 +133,7 @@ export function CSVUploadForm() {
     const file = data.file
     if (file) {
       if (latestCsvFile && latestCsvFile.id) {
-        updateFile(latestCsvFile.id, file)
+        updateFile({ id: latestCsvFile.id, file })
       } else {
         uploadFile(file)
       }
