@@ -29,7 +29,7 @@ class MarketApi {
     this.socket.on('connect', async () => {
       console.log('WebSocket connected')
 
-      const userId = 'user123'
+      const userId = getUserId()
       try {
         const subscriptionData = await getSubscription(userId)
         console.log('Subscription data:', subscriptionData)
@@ -126,7 +126,8 @@ export const deleteAllSubscription = async (userId: string) => {
 export const deleteInstrumentKey = async (
   instrumentKeys: string[]
 ): Promise<any> => {
-  const userId = 'user123'
+  const userId = getUserId()
+
   try {
     const response = await ApiConfig.delete(
       `/market-feed/${userId}/instruments`,

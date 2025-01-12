@@ -1,8 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconCloudUpload } from '@tabler/icons-react'
+import { getCsvFiles, updateCsvFile, uploadCsvFile } from '@/api/api.csv-upload'
+import { useApi } from '@/hooks/use-api'
 import { toast } from '@/hooks/use-toast'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -32,33 +34,43 @@ export function CSVUploadForm() {
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [fileError, setFileError] = useState<string>('')
+  const [latestCsvFile, setLatestCsvFile] = useState<{
+    id: string
+    fileURL: string
+    lastUpdatedDate: string
+  } | null>(null)
 
-  function onSubmit(data: CSVUploadFormValues) {
-    const file = data.file
-    if (file) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        const binaryData = reader.result
-        console.log('Binary data:', binaryData)
-        toast({
-          title: 'File uploaded successfully',
-          description: `File: ${file.name}, Binary data loaded.`,
+  const { isLoading: isFetching, mutate: fetchCsvFiles } = useApi({
+    apiCall: getCsvFiles,
+    method: 'GET',
+    onError: (err) => console.error('Error fetching CSV files:', err),
+    onSuccess: (data) => {
+      if (Array.isArray(data.data)) {
+        const sortedFiles = data.data.sort((a: any, b: any) => {
+          return (
+            new Date(b.lastUpdatedDate).getTime() -
+            new Date(a.lastUpdatedDate).getTime()
+          )
         })
+        const latestFile = sortedFiles[0]
+        setLatestCsvFile({
+          id: latestFile?._id,
+          fileURL: latestFile?.csvFileUrl,
+          lastUpdatedDate: latestFile?.lastUpdatedDate,
+        })
+      } else {
+        console.error('Fetched data is not in the expected format:', data)
+      }
+    },
+  })
 
-        setSelectedFile(null)
-        setFileError('')
-        form.reset()
-      }
-      reader.onerror = (error) => {
-        console.error('Error reading file:', error)
-        toast({
-          title: 'Error',
-          description: 'Failed to read the file.',
-        })
-      }
-      reader.readAsArrayBuffer(file)
+  const hasFetched = useRef(false)
+  useEffect(() => {
+    if (!hasFetched.current) {
+      fetchCsvFiles(undefined)
+      hasFetched.current = true
     }
-  }
+  }, [fetchCsvFiles])
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -72,6 +84,63 @@ export function CSVUploadForm() {
       }
     }
   }
+
+  const { isLoading: isUploading, mutate: uploadFile } = useApi({
+    apiCall: uploadCsvFile,
+    method: 'POST',
+    onSuccess: (data) => {
+      console.log(data)
+      toast({
+        title: 'File uploaded successfully',
+        description: `File: ${selectedFile?.name} uploaded.`,
+      })
+      setSelectedFile(null)
+      form.reset()
+    },
+    onError: (error) => {
+      console.error('Error uploading file:', error)
+      toast({
+        title: 'Upload failed',
+        description: 'There was an error uploading the file.',
+        variant: 'destructive',
+      })
+    },
+  })
+
+  const { isLoading: isUpdating, mutate: updateFile } = useApi({
+    apiCall: updateCsvFile,
+    onSuccess: (data) => {
+      console.log(data);
+      toast({
+        title: 'File updated successfully',
+        description: `File: ${selectedFile?.name} updated.`,
+      })
+      setSelectedFile(null)
+      form.reset()
+    },
+    onError: (error) => {
+      console.error('Error updating file:', error)
+      toast({
+        title: 'Update failed',
+        description: 'There was an error updating the file.',
+        variant: 'destructive',
+      })
+    },
+    method: 'PUT',
+  })
+
+  const onSubmit = async (data: CSVUploadFormValues) => {
+    const file = data.file
+    if (file) {
+      if (latestCsvFile && latestCsvFile.id) {
+        updateFile(latestCsvFile.id, file)
+      } else {
+        uploadFile(file)
+      }
+    }
+  }
+
+  const isLoading = isUploading || isUpdating || isFetching
 
   return (
     <Card className='w-full max-w-md p-6 flex justify-center items-center mx-auto'>
@@ -120,8 +189,8 @@ export function CSVUploadForm() {
               </FormItem>
             )}
           />
-          <Button type='submit' className='w-full'>
-            Upload File
+          <Button type='submit' className='w-full' disabled={isLoading}>
+            {isLoading ? 'Processing...' : 'Upload File'}
           </Button>
         </form>
       </Form>
