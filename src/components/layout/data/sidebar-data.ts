@@ -15,6 +15,7 @@ import {
   IconUserOff,
   IconUsers,
   IconBuildingBank,
+  IconFileUpload,
 } from '@tabler/icons-react'
 import { AudioWaveform, Command, GalleryVerticalEnd } from 'lucide-react'
 import { type SidebarData } from '../types'
@@ -82,32 +83,32 @@ export const sidebarData: SidebarData = {
     {
       title: 'Pages',
       items: [
-        {
-          title: 'Auth',
-          icon: IconLockAccess,
-          items: [
-            {
-              title: 'Sign In',
-              url: '/sign-in',
-            },
-            {
-              title: 'Sign In (2 Col)',
-              url: '/sign-in-2',
-            },
-            {
-              title: 'Sign Up',
-              url: '/sign-up',
-            },
-            {
-              title: 'Forgot Password',
-              url: '/forgot-password',
-            },
-            {
-              title: 'OTP',
-              url: '/otp',
-            },
-          ],
-        },
+        // {
+        //   title: 'Auth',
+        //   icon: IconLockAccess,
+        //   items: [
+        //     // {
+        //     //   title: 'Sign In',
+        //     //   url: '/sign-in',
+        //     // },
+        //     // {
+        //     //   title: 'Sign In (2 Col)',
+        //     //   url: '/sign-in-2',
+        //     // },
+        //     // {
+        //     //   title: 'Sign Up',
+        //     //   url: '/sign-up',
+        //     // },
+        //     // {
+        //     //   title: 'Forgot Password',
+        //     //   url: '/forgot-password',
+        //     // },
+        //     // {
+        //     //   title: 'OTP',
+        //     //   url: '/otp',
+        //     // },
+        //   ],
+        // },
         {
           title: 'Errors',
           icon: IconBug,
@@ -172,6 +173,11 @@ export const sidebarData: SidebarData = {
               title: 'Display',
               url: '/settings/display',
               icon: IconBrowserCheck,
+            },
+            {
+              title: 'CSV Upload',
+              url: '/settings/csv-upload',
+              icon: IconFileUpload,
             },
           ],
         },

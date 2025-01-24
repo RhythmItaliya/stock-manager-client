@@ -7,12 +7,12 @@ export default function Otp() {
   return (
     <AuthLayout>
       <Card className='p-6'>
-        <div className='mb-2 flex flex-col space-y-2 text-left'>
-          <h1 className='text-md font-semibold tracking-tight'>
+        <div className='flex flex-col space-y-2 text-left'>
+          <h1 className='text-2xl font-semibold tracking-tight'>
             Two-factor Authentication
           </h1>
-          <p className='text-sm text-muted-foreground'>
-            Please enter the authentication code. <br /> We have sent the
+          <p className='text-sm text-muted-foreground py-1.5'>
+            Please enter the authentication code. We have sent the
             authentication code to your email.
           </p>
         </div>
@@ -23,7 +23,7 @@ export default function Otp() {
             to='/sign-in'
             className='underline underline-offset-4 hover:text-primary'
           >
-            Resend a new code.
+            Resend a new code
           </Link>
           .
         </p>

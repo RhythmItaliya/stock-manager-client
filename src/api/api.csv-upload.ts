@@ -27,7 +27,6 @@ export const getCsvFiles = async () => {
 }
 
 export const updateCsvFile = async (id: string, file: File) => {
-  console.log(id,file)
   const formData = new FormData()
   formData.append('file', file)
   try {
@@ -39,6 +38,16 @@ export const updateCsvFile = async (id: string, file: File) => {
     return response.data
   } catch (error) {
     console.error('Error updating CSV file:', error)
+    throw error
+  }
+}
+
+export const fetchAndParseCsvFile = async () => {
+  try {
+    const response = await ApiConfig.get('/fetch-and-parse-csv')
+    return response.data
+  } catch (error) {
+    console.error('Error fetching CSV file:', error)
     throw error
   }
 }

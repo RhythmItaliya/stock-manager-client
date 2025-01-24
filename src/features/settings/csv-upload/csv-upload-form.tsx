@@ -88,8 +88,7 @@ export function CSVUploadForm() {
   const { isLoading: isUploading, mutate: uploadFile } = useApi({
     apiCall: uploadCsvFile,
     method: 'POST',
-    onSuccess: (data) => {
-      console.log(data)
+    onSuccess: () => {
       toast({
         title: 'File uploaded successfully',
         description: `File: ${selectedFile?.name} uploaded.`,
@@ -108,9 +107,9 @@ export function CSVUploadForm() {
   })
 
   const { isLoading: isUpdating, mutate: updateFile } = useApi({
-    apiCall: ({ id, file }: { id: string, file: File }) => updateCsvFile(id, file),
-    onSuccess: (data) => {
-      console.log(data);
+    apiCall: ({ id, file }: { id: string; file: File }) =>
+      updateCsvFile(id, file),
+    onSuccess: () => {
       toast({
         title: 'File updated successfully',
         description: `File: ${selectedFile?.name} updated.`,

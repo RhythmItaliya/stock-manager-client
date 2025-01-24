@@ -1,10 +1,13 @@
-import { HTMLAttributes, useState } from 'react'
+import { HTMLAttributes } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link } from '@tanstack/react-router'
-import { IconBrandFacebook, IconBrandGithub } from '@tabler/icons-react'
+import { useNavigate } from '@tanstack/react-router'
+import { loginUser } from '@/api/api.auth'
 import { cn } from '@/lib/utils'
+import { useApi } from '@/hooks/use-api'
+import { toast } from '@/hooks/use-toast'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -35,7 +38,7 @@ const formSchema = z.object({
 })
 
 export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
-  const [isLoading, setIsLoading] = useState(false)
+  const navigate = useNavigate()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -45,16 +48,39 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     },
   })
 
+  const { mutate: loginApi, isLoading } = useApi({
+    apiCall: loginUser,
+    method: 'POST',
+    onSuccess: (data) => {
+      const token = data.data.token
+      console.log(token)
+      if (token) {
+        localStorage.setItem('accessToken', token)
+        toast({
+          title: 'Login successful',
+          description: 'Welcome back!',
+        })
+        navigate({ to: '/' })
+      } else {
+        toast({
+          title: 'Login failed',
+          description: 'Token was not received',
+          variant: 'destructive',
+        })
+      }
+    },
+    onError: (error) => {
+      toast({
+        title: 'Login failed',
+        description: error instanceof Error ? error.message : 'Unknown error',
+        variant: 'destructive',
+      })
+    },
+  })
+
   function onSubmit(data: z.infer<typeof formSchema>) {
-    setIsLoading(true)
-    // eslint-disable-next-line no-console
-    console.log(data)
-
-    setTimeout(() => {
-      setIsLoading(false)
-    }, 3000)
+    loginApi({ email: data.email, password: data.password })
   }
-
   return (
     <div className={cn('grid gap-6', className)} {...props}>
       <Form {...form}>
@@ -104,28 +130,9 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               </div>
               <div className='relative flex justify-center text-xs uppercase'>
                 <span className='bg-background px-2 text-muted-foreground'>
-                  Or continue with
+                  By clicking login, you agree to our
                 </span>
               </div>
-            </div>
-
-            <div className='flex items-center gap-2'>
-              <Button
-                variant='outline'
-                className='w-full'
-                type='button'
-                disabled={isLoading}
-              >
-                <IconBrandGithub className='h-4 w-4' /> GitHub
-              </Button>
-              <Button
-                variant='outline'
-                className='w-full'
-                type='button'
-                disabled={isLoading}
-              >
-                <IconBrandFacebook className='h-4 w-4' /> Facebook
-              </Button>
             </div>
           </div>
         </form>
