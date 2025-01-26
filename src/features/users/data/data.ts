@@ -18,13 +18,13 @@ export const callTypes = new Map<UserStatus, string>([
 
 export const userTypes = [
   {
-    label: 'Superadmin',
-    value: 'superadmin',
+    label: 'Super-admin',
+    value: 'super-admin',
     icon: IconShield,
   },
   {
-    label: 'Admin',
-    value: 'admin',
+    label: 'Sub-admin',
+    value: 'sub-admin',
     icon: IconUserShield,
   },
   {
@@ -33,8 +33,8 @@ export const userTypes = [
     icon: IconUsersGroup,
   },
   {
-    label: 'Cashier',
-    value: 'cashier',
+    label: 'User',
+    value: 'user',
     icon: IconCash,
   },
 ] as const

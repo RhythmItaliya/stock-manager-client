@@ -3,6 +3,8 @@
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { createUser } from '@/api/api.user'
+import { useApi } from '@/hooks/use-api'
 import { toast } from '@/hooks/use-toast'
 import { Button } from '@/components/ui/button'
 import {
@@ -30,10 +32,7 @@ import { User } from '../data/schema'
 
 const formSchema = z
   .object({
-    firstName: z.string().min(1, { message: 'First Name is required.' }),
-    lastName: z.string().min(1, { message: 'Last Name is required.' }),
     username: z.string().min(1, { message: 'Username is required.' }),
-    phoneNumber: z.string().min(1, { message: 'Phone number is required.' }),
     email: z
       .string()
       .min(1, { message: 'Email is required.' })
@@ -106,29 +105,42 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
           isEdit,
         }
       : {
-          firstName: '',
-          lastName: '',
           username: '',
           email: '',
           role: '',
-          phoneNumber: '',
           password: '',
           confirmPassword: '',
           isEdit,
         },
   })
 
+  const { mutate, isLoading } = useApi({
+    apiCall: createUser,
+    onSuccess: (data) => {
+      toast({
+        title: 'User Created Successfully',
+        description: (
+          <pre className='mt-2 w-[340px] rounded-md bg-slate-950 p-4'>
+            <code className='text-white'>{JSON.stringify(data, null, 2)}</code>
+          </pre>
+        ),
+      })
+      form.reset()
+      onOpenChange(false)
+    },
+    onError: (error: any) => {
+      console.error('Error creating user:', error)
+      toast({
+        title: 'Error',
+        description: `Error creating the user: ${error.message}`,
+        variant: 'destructive',
+      })
+    },
+    method: 'POST',
+  })
+
   const onSubmit = (values: UserForm) => {
-    form.reset()
-    toast({
-      title: 'You submitted the following values:',
-      description: (
-        <pre className='mt-2 w-[340px] rounded-md bg-slate-950 p-4'>
-          <code className='text-white'>{JSON.stringify(values, null, 2)}</code>
-        </pre>
-      ),
-    })
-    onOpenChange(false)
+    mutate(values)
   }
 
   const isPasswordTouched = !!form.formState.dirtyFields.password
@@ -156,46 +168,6 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
               onSubmit={form.handleSubmit(onSubmit)}
               className='space-y-4 p-0.5'
             >
-              <FormField
-                control={form.control}
-                name='firstName'
-                render={({ field }) => (
-                  <FormItem className='grid grid-cols-6 items-center gap-x-4 gap-y-1 space-y-0'>
-                    <FormLabel className='col-span-2 text-right'>
-                      First Name
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder='John'
-                        className='col-span-4'
-                        autoComplete='off'
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage className='col-span-4 col-start-3' />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name='lastName'
-                render={({ field }) => (
-                  <FormItem className='grid grid-cols-6 items-center gap-x-4 gap-y-1 space-y-0'>
-                    <FormLabel className='col-span-2 text-right'>
-                      Last Name
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder='Doe'
-                        className='col-span-4'
-                        autoComplete='off'
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage className='col-span-4 col-start-3' />
-                  </FormItem>
-                )}
-              />
               <FormField
                 control={form.control}
                 name='username'
@@ -226,25 +198,6 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
                     <FormControl>
                       <Input
                         placeholder='john.doe@gmail.com'
-                        className='col-span-4'
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage className='col-span-4 col-start-3' />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name='phoneNumber'
-                render={({ field }) => (
-                  <FormItem className='grid grid-cols-6 items-center gap-x-4 gap-y-1 space-y-0'>
-                    <FormLabel className='col-span-2 text-right'>
-                      Phone Number
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder='+123456789'
                         className='col-span-4'
                         {...field}
                       />
@@ -318,8 +271,8 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
           </Form>
         </ScrollArea>
         <DialogFooter>
-          <Button type='submit' form='user-form'>
-            Save changes
+          <Button type='submit' form='user-form' disabled={isLoading}>
+            {isLoading ? 'Saving...' : 'Save changes'}
           </Button>
         </DialogFooter>
       </DialogContent>
