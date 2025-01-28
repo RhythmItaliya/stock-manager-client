@@ -3,9 +3,6 @@
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { createUser } from '@/api/api.user'
-import { useApi } from '@/hooks/use-api'
-import { toast } from '@/hooks/use-toast'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -29,6 +26,7 @@ import { PasswordInput } from '@/components/password-input'
 import { SelectDropdown } from '@/components/select-dropdown'
 import { userTypes } from '../data/data'
 import { User } from '../data/schema'
+import { createUserAction } from './hook/useUsers'
 
 const formSchema = z
   .object({
@@ -114,30 +112,7 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
         },
   })
 
-  const { mutate, isLoading } = useApi({
-    apiCall: createUser,
-    onSuccess: (data) => {
-      toast({
-        title: 'User Created Successfully',
-        description: (
-          <pre className='mt-2 w-[340px] rounded-md bg-slate-950 p-4'>
-            <code className='text-white'>{JSON.stringify(data, null, 2)}</code>
-          </pre>
-        ),
-      })
-      form.reset()
-      onOpenChange(false)
-    },
-    onError: (error: any) => {
-      console.error('Error creating user:', error)
-      toast({
-        title: 'Error',
-        description: `Error creating the user: ${error.message}`,
-        variant: 'destructive',
-      })
-    },
-    method: 'POST',
-  })
+  const { mutate, isLoading } = createUserAction(form, onOpenChange)
 
   const onSubmit = (values: UserForm) => {
     mutate(values)

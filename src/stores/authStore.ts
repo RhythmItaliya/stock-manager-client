@@ -1,14 +1,9 @@
 import Cookies from 'js-cookie'
+import { jwtDecode } from 'jwt-decode'
 import { create } from 'zustand'
+import { AuthUser } from './types'
 
-const ACCESS_TOKEN = 'thisisjustarandomstring'
-
-interface AuthUser {
-  accountNo: string
-  email: string
-  role: string[]
-  exp: number
-}
+const ACCESS_TOKEN = 'accessToken'
 
 interface AuthState {
   auth: {
@@ -23,22 +18,34 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>()((set) => {
   const cookieState = Cookies.get(ACCESS_TOKEN)
-  const initToken = cookieState ? JSON.parse(cookieState) : ''
+  const initToken = cookieState || ''
+  const initUser = initToken ? jwtDecode<AuthUser>(initToken) : null
+
   return {
     auth: {
-      user: null,
-      setUser: (user) =>
-        set((state) => ({ ...state, auth: { ...state.auth, user } })),
+      user: initUser,
+      setUser: (user: AuthUser | null) =>
+        set((state) => ({
+          ...state,
+          auth: { ...state.auth, user },
+        })),
       accessToken: initToken,
-      setAccessToken: (accessToken) =>
+      setAccessToken: (accessToken: string) =>
         set((state) => {
-          Cookies.set(ACCESS_TOKEN, JSON.stringify(accessToken))
-          return { ...state, auth: { ...state.auth, accessToken } }
+          Cookies.set(ACCESS_TOKEN, accessToken, { expires: 1 })
+          const decodedUser = jwtDecode<AuthUser>(accessToken)
+          return {
+            ...state,
+            auth: { ...state.auth, accessToken, user: decodedUser },
+          }
         }),
       resetAccessToken: () =>
         set((state) => {
           Cookies.remove(ACCESS_TOKEN)
-          return { ...state, auth: { ...state.auth, accessToken: '' } }
+          return {
+            ...state,
+            auth: { ...state.auth, accessToken: '' },
+          }
         }),
       reset: () =>
         set((state) => {
@@ -51,5 +58,3 @@ export const useAuthStore = create<AuthState>()((set) => {
     },
   }
 })
-
-// export const useAuth = () => useAuthStore((state) => state.auth)

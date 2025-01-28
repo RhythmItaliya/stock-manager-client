@@ -3,11 +3,7 @@ import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link } from '@tanstack/react-router'
-import { useNavigate } from '@tanstack/react-router'
-import { loginUser } from '@/api/api.auth'
 import { cn } from '@/lib/utils'
-import { useApi } from '@/hooks/use-api'
-import { toast } from '@/hooks/use-toast'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -19,6 +15,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/password-input'
+import { useAuth } from '../../auth-api'
 
 type UserAuthFormProps = HTMLAttributes<HTMLDivElement>
 
@@ -38,8 +35,6 @@ const formSchema = z.object({
 })
 
 export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
-  const navigate = useNavigate()
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -48,35 +43,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     },
   })
 
-  const { mutate: loginApi, isLoading } = useApi({
-    apiCall: loginUser,
-    method: 'POST',
-    onSuccess: (data) => {
-      const token = data.data.token
-      console.log(token)
-      if (token) {
-        localStorage.setItem('accessToken', token)
-        toast({
-          title: 'Login successful',
-          description: 'Welcome back!',
-        })
-        navigate({ to: '/' })
-      } else {
-        toast({
-          title: 'Login failed',
-          description: 'Token was not received',
-          variant: 'destructive',
-        })
-      }
-    },
-    onError: (error) => {
-      toast({
-        title: 'Login failed',
-        description: error instanceof Error ? error.message : 'Unknown error',
-        variant: 'destructive',
-      })
-    },
-  })
+  const { loginApi, isLoading } = useAuth()
 
   function onSubmit(data: z.infer<typeof formSchema>) {
     loginApi({ email: data.email, password: data.password })

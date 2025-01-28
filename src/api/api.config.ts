@@ -1,5 +1,6 @@
 // api.config.ts
 import axios from 'axios'
+import Cookies from 'js-cookie'
 
 export const ApiConfig = axios.create({
   baseURL: 'http://localhost:3000/api',
@@ -9,11 +10,12 @@ export const ApiConfig = axios.create({
 })
 
 export function getUserId(): string {
-  return localStorage.getItem('userId') || 'user123'
+  return localStorage.getItem('accessToken') || 'user123'
 }
 
 export function getAuthToken(): string | null {
-  const token = localStorage.getItem('accessToken')
+  const token =
+    Cookies.get('accessToken') || localStorage.getItem('accessToken')
   if (!token) {
     console.error('No access token found')
     return null
