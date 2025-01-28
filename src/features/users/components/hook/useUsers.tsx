@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { createUser } from '@/api/api.user'
+import { createUser, deleteUser, updateUser } from '@/api/api.user'
 import { getUsers } from '@/api/api.user'
 import { useApi } from '@/hooks/use-api'
 import { toast } from '@/hooks/use-toast'
@@ -58,6 +58,69 @@ export function createUserAction(
       })
     },
     method: 'POST',
+  })
+
+  return { mutate, isLoading }
+}
+
+export function deleteUserAction(
+  userId: string,
+  onOpenChange: (open: boolean) => void
+) {
+  const { mutate, isLoading } = useApi({
+    apiCall: () => deleteUser(userId),
+    onSuccess: (data) => {
+      toast({
+        title: 'User Deleted Successfully',
+        description: (
+          <pre className='mt-2 w-[340px] rounded-md bg-slate-950 p-4'>
+            <code className='text-white'>{JSON.stringify(data, null, 2)}</code>
+          </pre>
+        ),
+      })
+      onOpenChange(false)
+    },
+    onError: (error: any) => {
+      console.error('Error deleting user:', error)
+      toast({
+        title: 'Error',
+        description: `Error deleting the user: ${error.message}`,
+        variant: 'destructive',
+      })
+    },
+    method: 'DELETE',
+  })
+
+  return { mutate, isLoading }
+}
+
+export function updateUserAction(
+  userId: string,
+  updatedUserData: any,
+  onOpenChange: (open: boolean) => void
+) {
+  const { mutate, isLoading } = useApi({
+    apiCall: () => updateUser(userId, updatedUserData),
+    onSuccess: (data) => {
+      toast({
+        title: 'User Updated Successfully',
+        description: (
+          <pre className='mt-2 w-[340px] rounded-md bg-slate-950 p-4'>
+            <code className='text-white'>{JSON.stringify(data, null, 2)}</code>
+          </pre>
+        ),
+      })
+      onOpenChange(false)
+    },
+    onError: (error: any) => {
+      console.error('Error updating user:', error)
+      toast({
+        title: 'Error',
+        description: `Error updating the user: ${error.message}`,
+        variant: 'destructive',
+      })
+    },
+    method: 'PUT',
   })
 
   return { mutate, isLoading }

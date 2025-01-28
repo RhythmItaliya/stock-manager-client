@@ -42,3 +42,50 @@ export const createUser = async (userData: {
     throw error
   }
 }
+
+/**
+ * Delete User - Delete a user by ID
+ * @param userId - The ID of the user to delete
+ */
+export const deleteUser = async (userId: string) => {
+  const token = getAuthToken()
+  try {
+    const response = await ApiConfig.delete(`/users/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    return response.data
+  } catch (error) {
+    console.error('Error deleting user:', error)
+    throw error
+  }
+}
+
+/**
+ * Update User - Update a user's details by ID
+ * @param userId - The ID of the user to update
+ * @param userData - The updated user data (username, email, role, status, etc.)
+ */
+export const updateUser = async (
+  userId: string,
+  userData: {
+    username?: string
+    email?: string
+    role?: string
+    status?: string
+  }
+) => {
+  const token = getAuthToken()
+  try {
+    const response = await ApiConfig.put(`/users/${userId}`, userData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    return response.data
+  } catch (error) {
+    console.error('Error updating user:', error)
+    throw error
+  }
+}

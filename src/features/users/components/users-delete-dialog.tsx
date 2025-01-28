@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ConfirmDialog } from '@/components/confirm-dialog'
 import { User } from '../data/schema'
+import { deleteUserAction } from './hook/useUsers'
 
 interface Props {
   open: boolean
@@ -17,11 +18,15 @@ interface Props {
 
 export function UsersDeleteDialog({ open, onOpenChange, currentRow }: Props) {
   const [value, setValue] = useState('')
+  const userId = currentRow._id
+  const { mutate: deleteUser, isLoading } = deleteUserAction(
+    userId,
+    onOpenChange
+  )
 
   const handleDelete = () => {
-    if (value.trim() !== currentRow.username) return
-
-    onOpenChange(false)
+    if (value.trim() !== currentRow.username || !userId) return
+    deleteUser(undefined)
     toast({
       title: 'The following user has been deleted:',
       description: (
@@ -79,7 +84,7 @@ export function UsersDeleteDialog({ open, onOpenChange, currentRow }: Props) {
           </Alert>
         </div>
       }
-      confirmText='Delete'
+      confirmText={isLoading ? 'Deleting...' : 'Delete'}
       destructive
     />
   )
