@@ -18,13 +18,15 @@ class MarketApi {
         console.error('Error loading Protobuf:', err)
         return
       }
-      this.protobufRoot = root
+      this.protobufRoot = root ?? null
+      // this.protobufRoot = root
       console.log('Protobuf Loaded Successfully')
     })
   }
 
   connect(url: string) {
-    this.socket = io.connect(url)
+    this.socket = io(url)
+    // this.socket = io.connect(url)
 
     this.socket.on('connect', async () => {
       console.log('WebSocket connected')
@@ -54,7 +56,12 @@ class MarketApi {
           'com.upstox.marketdatafeeder.rpc.proto.FeedResponse'
         )
         const decodedMessage = FeedResponse.decode(arrayBuffer)
-        this.notifySubscribers(decodedMessage as FeedResponseType)
+        if ('feeds' in decodedMessage) {
+          this.notifySubscribers(decodedMessage as FeedResponseType)
+        } else {
+          console.error('Invalid message format:', decodedMessage)
+        }
+        // this.notifySubscribers(decodedMessage as FeedResponseType)
       } catch (err) {
         console.error('Error decoding WebSocket data:', err)
       }

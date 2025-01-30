@@ -2,8 +2,8 @@ import {
   IconBarrierBlock,
   IconBrowserCheck,
   IconBug, // IconChecklist,
-  IconError404,
-  IconHelp, // IconLayoutDashboard,
+  IconError404, // IconHelp,
+  // IconLayoutDashboard,
   IconLock, // IconLockAccess,
   // IconMessages,
   IconNotification, // IconPackages,
@@ -21,14 +21,9 @@ import { AudioWaveform, Command, GalleryVerticalEnd } from 'lucide-react'
 import { type SidebarData } from '../types'
 
 export const sidebarData: SidebarData = {
-  user: {
-    name: 'satnaing',
-    email: 'satnaingdev@gmail.com',
-    avatar: '/avatars/shadcn.jpg',
-  },
   teams: [
     {
-      name: 'Shadcn Admin',
+      name: 'Stock Manager',
       logo: Command,
       plan: 'Vite + ShadcnUI',
     },
@@ -181,11 +176,11 @@ export const sidebarData: SidebarData = {
             },
           ],
         },
-        {
-          title: 'Help Center',
-          url: '/help-center',
-          icon: IconHelp,
-        },
+        // {
+        //   title: 'Help Center',
+        //   url: '/help-center',
+        //   icon: IconHelp,
+        // },
       ],
     },
   ],
