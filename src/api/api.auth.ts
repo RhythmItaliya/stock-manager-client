@@ -19,7 +19,7 @@ export const validateToken = async (token: string) => {
 }
 
 export const loginUser = async (credentials: {
-  email: string
+  identifier: string
   password: string
 }) => {
   try {

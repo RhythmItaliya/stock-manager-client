@@ -20,25 +20,23 @@ import { useAuth } from '../../auth-api'
 type UserAuthFormProps = HTMLAttributes<HTMLDivElement>
 
 const formSchema = z.object({
-  email: z
+  identifier: z
     .string()
-    .min(1, { message: 'Please enter your email' })
-    .email({ message: 'Invalid email address' }),
+    .min(1, { message: 'Please enter your email or username' })
+    .regex(
+      /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$|^[a-zA-Z0-9_]+$/,
+      { message: 'Invalid email or username format' }
+    ),
   password: z
     .string()
-    .min(1, {
-      message: 'Please enter your password',
-    })
-    .min(7, {
-      message: 'Password must be at least 7 characters long',
-    }),
+    .min(7, { message: 'Password must be at least 7 characters long' }),
 })
 
 export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: '',
+      identifier: '',
       password: '',
     },
   })
@@ -46,7 +44,10 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const { loginApi, isLoading } = useAuth()
 
   function onSubmit(data: z.infer<typeof formSchema>) {
-    loginApi({ email: data.email, password: data.password })
+    loginApi({
+      identifier: data.identifier,
+      password: data.password,
+    })
   }
   return (
     <div className={cn('grid gap-6', className)} {...props}>
@@ -55,12 +56,15 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
           <div className='grid gap-2'>
             <FormField
               control={form.control}
-              name='email'
+              name='identifier'
               render={({ field }) => (
                 <FormItem className='space-y-1'>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>Email or Username</FormLabel>
                   <FormControl>
-                    <Input placeholder='name@example.com' {...field} />
+                    <Input
+                      placeholder='Enter your email or username'
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

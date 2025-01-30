@@ -7,3 +7,10 @@ export interface AuthUser {
   username: string
   exp: number
 }
+
+export const RolePermissions: Record<Role, Role[]> = {
+  'super-admin': ['sub-admin', 'manager', 'user'],
+  'sub-admin': ['manager', 'user'],
+  manager: ['user'],
+  user: [],
+}

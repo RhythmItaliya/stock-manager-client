@@ -17,7 +17,7 @@ export const useAuth = () => {
     apiCall: loginUser,
     method: 'POST',
     onSuccess: (data) => {
-      const token = data.data.token
+      const token = data?.data?.token
       if (token) {
         Cookies.set(ACCESS_TOKEN, token, { expires: 1 / 24 })
         const decodedToken = jwtDecode<AuthUser>(token)
