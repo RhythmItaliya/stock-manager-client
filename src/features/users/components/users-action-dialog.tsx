@@ -26,7 +26,7 @@ import { PasswordInput } from '@/components/password-input'
 import { SelectDropdown } from '@/components/select-dropdown'
 import { User } from '../data/schema'
 import { useAvailableRoles } from '../utility/useAvailableRoles'
-import { createUserAction } from './hook/useUsers'
+import { createUserAction } from './hook/use-users-action'
 
 const formSchema = z
   .object({

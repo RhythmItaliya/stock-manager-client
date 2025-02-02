@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { IconSearch, IconX } from '@tabler/icons-react'
+import { useMarketWatchStore } from '@/stores/MarketWatchState'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -66,6 +67,15 @@ export function AddMarketNameDialog({
         }))
         setStocks(stockList)
         setFilteredStocks(stockList)
+
+        const defaultMarketWatch = marketWatchNames.find(
+          (marketWatch) => marketWatch.isDefaultMarket
+        )
+        if (defaultMarketWatch) {
+          useMarketWatchStore
+            .getState()
+            .setDefaultMarketWatch(defaultMarketWatch.name)
+        }
       } catch (error) {
         console.error('Error fetching market watches:', error)
       } finally {
@@ -149,6 +159,7 @@ export function AddMarketNameDialog({
       if (stock) {
         const response = await setDefaultMarketWatch(stock.name)
         console.log('Market watch set as default:', response)
+        useMarketWatchStore.getState().setDefaultMarketWatch(stock.name)
         setStocks((prevStocks) =>
           prevStocks.map((s) =>
             s.id === stockId

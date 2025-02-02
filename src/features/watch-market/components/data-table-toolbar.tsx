@@ -1,11 +1,14 @@
 import { useState } from 'react'
 import { Cross2Icon, PlusCircledIcon } from '@radix-ui/react-icons'
 import { Table } from '@tanstack/react-table'
+import { useMarketWatchStore } from '@/stores/MarketWatchState'
+import { useAuthStore } from '@/stores/authStore'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { AddStockDialog } from './data-add-stock-Dialog'
 import { AddMarketNameDialog } from './data-list-market-name'
 import { DataTableViewOptions } from './data-table-view-options'
+import { createWatchMarketSubscriptionAction } from './hook/use-watch-market'
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>
@@ -16,7 +19,20 @@ export function DataTableToolbar<TData>({
 }: DataTableToolbarProps<TData>) {
   const [isDialogOpen, setDialogOpen] = useState(false)
   const [isMarketWatchDialogOpen, setMarketWatchDialogOpen] = useState(false)
+  const [selectedStock, setSelectedStock] = useState<any>(null)
   const isFiltered = table.getState().columnFilters.length > 0
+  const { user } = useAuthStore((state) => state.auth)
+  const { defaultMarketWatch } = useMarketWatchStore()
+
+  const { mutate: createSubscription, isLoading } =
+    createWatchMarketSubscriptionAction(
+      {
+        userId: user?.id || '',
+        instrumentKeys: selectedStock ? [selectedStock.instrument_key] : [],
+        marketWatchName: defaultMarketWatch || 'default',
+      },
+      setMarketWatchDialogOpen
+    )
 
   const handleAddClick = () => {
     setDialogOpen(true)
@@ -32,6 +48,13 @@ export function DataTableToolbar<TData>({
 
   const handleMarketWatchDialogClose = () => {
     setMarketWatchDialogOpen(false)
+  }
+
+  const handleSelectStock = (stock: any) => {
+    setSelectedStock(stock)
+    if (stock && user) {
+      createSubscription(undefined)
+    }
   }
 
   return (
@@ -78,7 +101,13 @@ export function DataTableToolbar<TData>({
       </div>
       <DataTableViewOptions table={table} />
 
-      <AddStockDialog isOpen={isDialogOpen} onClose={handleDialogClose} />
+      <AddStockDialog
+        isOpen={isDialogOpen}
+        onClose={handleDialogClose}
+        onSelect={handleSelectStock}
+        isLoading={isLoading}
+      />
+
       <AddMarketNameDialog
         isOpen={isMarketWatchDialogOpen}
         onClose={handleMarketWatchDialogClose}

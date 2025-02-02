@@ -1,11 +1,14 @@
 // api.marketFeed.ts
 import protobuf from 'protobufjs'
 import { io, Socket } from 'socket.io-client'
-import { ApiConfig, getUserId } from '@/api/api.config'
+import { getUserId } from '@/api/api.config'
+import { getSubscriptions } from './api.subscription'
 
 type FeedResponseType = {
   feeds: Record<string, any>
 }
+
+const userId = getUserId() || ''
 
 class MarketApi {
   private socket: Socket | null = null
@@ -30,10 +33,8 @@ class MarketApi {
 
     this.socket.on('connect', async () => {
       console.log('WebSocket connected')
-
-      const userId = getUserId()
       try {
-        const subscriptionData = await getSubscription(userId)
+        const subscriptionData = await getSubscriptions(userId)
         console.log('Subscription data:', subscriptionData)
       } catch (error) {
         console.error('Error fetching subscription data on connect:', error)
@@ -93,56 +94,3 @@ class MarketApi {
 
 const marketApi = new MarketApi()
 export default marketApi
-
-export const postSubscription = async (
-  userId: string,
-  instrumentKeys: string[]
-) => {
-  try {
-    const response = await ApiConfig.post('/market-feed', {
-      userId,
-      instrumentKeys,
-    })
-    return response.data
-  } catch (error) {
-    console.error('Error subscribing to instruments:', error)
-    throw error
-  }
-}
-
-export const getSubscription = async (userId: string) => {
-  try {
-    const response = await ApiConfig.get(`/market-feed/${userId}`)
-    return response.data
-  } catch (error) {
-    console.error('Error fetching subscription:', error)
-    throw error
-  }
-}
-
-export const deleteAllSubscription = async (userId: string) => {
-  try {
-    const response = await ApiConfig.delete(`/market-feed/${userId}`)
-    return response.data
-  } catch (error) {
-    console.error('Error deleting all subscribe:', error)
-    throw error
-  }
-}
-
-export const deleteInstrumentKey = async (
-  instrumentKeys: string[]
-): Promise<any> => {
-  const userId = getUserId()
-
-  try {
-    const response = await ApiConfig.delete(
-      `/market-feed/${userId}/instruments`,
-      { data: { instrumentKeys } }
-    )
-    return response.data
-  } catch (error) {
-    console.error('Error deleting instrument keys:', error)
-    throw error
-  }
-}

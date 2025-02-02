@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ConfirmDialog } from '@/components/confirm-dialog'
 import { User } from '../data/schema'
-import { deleteUserAction } from './hook/useUsers'
+import { deleteUserAction } from './hook/use-users-action'
 
 interface Props {
   open: boolean

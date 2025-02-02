@@ -1,14 +1,13 @@
 'use client'
 
-import { useState } from 'react'
 import { IconAlertTriangle } from '@tabler/icons-react'
-import { toast } from '@/hooks/use-toast'
+import { useAuthStore } from '@/stores/authStore'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { ConfirmDialog } from '@/components/confirm-dialog'
-import { deleteInstrumentKey } from '../../../api/api.marketFeed'
 import { WatchMarket } from '../data/schema'
+import { deleteWatchMarketSubscriptionAction } from './hook/use-watch-market'
 
-interface Props {
+export interface Props {
   open: boolean
   onOpenChange: (open: boolean) => void
   currentRow: WatchMarket
@@ -21,26 +20,22 @@ export function WatchMarketsDeleteDialog({
   currentRow,
   onDeleteSuccess,
 }: Props) {
-  const [isLoading, setIsLoading] = useState(false)
+  const { user } = useAuthStore((state) => state.auth)
+  if (!user) {
+    console.error('Error: User is not authenticated')
+    return null
+  }
 
-  const handleDelete = async () => {
-    setIsLoading(true)
-    try {
-      await deleteInstrumentKey([currentRow.displayName])
-      onOpenChange(false)
-      onDeleteSuccess(currentRow)
-      toast({
-        title: `The following WatchMarket has been deleted: ${currentRow.displayName}`,
-      })
-    } catch (error) {
-      toast({
-        title: 'Error deleting WatchMarket',
-        description: 'Something went wrong while deleting the item.',
-        variant: 'destructive',
-      })
-    } finally {
-      setIsLoading(false)
-    }
+  const displayName = currentRow.displayName
+  if (!displayName) {
+    console.error('Error: displayName is undefined for the current row')
+    return null
+  }
+  const { mutate: deleteMarket, isLoading } =
+    deleteWatchMarketSubscriptionAction([displayName], user.id, onOpenChange)
+  const handleDelete = () => {
+    deleteMarket(undefined)
+    onDeleteSuccess(currentRow)
   }
 
   return (

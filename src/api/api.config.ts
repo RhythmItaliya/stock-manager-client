@@ -1,6 +1,7 @@
 // api.config.ts
 import axios from 'axios'
 import Cookies from 'js-cookie'
+import { useAuthStore } from '@/stores/authStore'
 
 export const ApiConfig = axios.create({
   baseURL: 'http://localhost:3000/api',
@@ -9,8 +10,14 @@ export const ApiConfig = axios.create({
   },
 })
 
-export function getUserId(): string {
-  return localStorage.getItem('accessToken') || 'user123'
+export function getUserId(): string | null {
+  try {
+    const user = useAuthStore.getState().auth.user
+    return user?.id || null
+  } catch (error) {
+    console.error('Error retrieving user ID:', error)
+    return null
+  }
 }
 
 export function getAuthToken(): string | null {

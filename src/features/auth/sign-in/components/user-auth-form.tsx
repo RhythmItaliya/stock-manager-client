@@ -23,10 +23,9 @@ const formSchema = z.object({
   identifier: z
     .string()
     .min(1, { message: 'Please enter your email or username' })
-    .regex(
-      /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$|^[a-zA-Z0-9_]+$/,
-      { message: 'Invalid email or username format' }
-    ),
+    .regex(/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$|^[a-zA-Z0-9_]+$/, {
+      message: 'Invalid email or username format',
+    }),
   password: z
     .string()
     .min(7, { message: 'Password must be at least 7 characters long' }),
