@@ -28,6 +28,7 @@ export const createUser = async (userData: {
   email: string
   password: string
   role: string
+  managerId?: string
 }) => {
   const token = getAuthToken()
   try {
@@ -86,6 +87,25 @@ export const updateUser = async (
     return response.data
   } catch (error) {
     console.error('Error updating user:', error)
+    throw error
+  }
+}
+
+/**
+ * Get Managers - Fetch list of managers (accessible only to super-admin and sub-admin)
+ * @param token - The Bearer token for authentication
+ */
+export const getManagersList = async () => {
+  const token = getAuthToken()
+  try {
+    const response = await ApiConfig.get('/users/managers', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    return response.data
+  } catch (error) {
+    console.error('Error fetching managers:', error)
     throw error
   }
 }

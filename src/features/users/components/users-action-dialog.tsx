@@ -1,8 +1,11 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { getManagersList } from '@/api/api.user'
+import { useAuthStore } from '@/stores/authStore'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -21,6 +24,7 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import LoadingSpinner from '@/components/ui/loadingSpinner'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { PasswordInput } from '@/components/password-input'
 import { SelectDropdown } from '@/components/select-dropdown'
@@ -39,6 +43,7 @@ const formSchema = z
     role: z.string().min(1, { message: 'Role is required.' }),
     confirmPassword: z.string().transform((pwd) => pwd.trim()),
     isEdit: z.boolean(),
+    managerId: z.string().optional(),
   })
   .superRefine(({ isEdit, password, confirmPassword }, ctx) => {
     if (!isEdit || (isEdit && password !== '')) {
@@ -91,6 +96,11 @@ interface Props {
   onOpenChange: (open: boolean) => void
 }
 
+interface Manager {
+  _id: string
+  username: string
+}
+
 export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
   const isEdit = !!currentRow
   const form = useForm<UserForm>({
@@ -101,6 +111,7 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
           password: '',
           confirmPassword: '',
           isEdit,
+          managerId: currentRow?.managerId || '',
         }
       : {
           username: '',
@@ -109,18 +120,63 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
           password: '',
           confirmPassword: '',
           isEdit,
+          managerId: '',
         },
   })
 
-  const { mutate, isLoading } = createUserAction(form, onOpenChange)
+  const { user } = useAuthStore((state) => state.auth)
 
+  const [selectedRole, setSelectedRole] = useState('')
+  const [managersData, setManagersData] = useState<Manager[]>([])
+  const [isManagersLoading, setIsManagersLoading] = useState(false)
+  const [managersFetched, setManagersFetched] = useState(false)
+
+  const { mutate, isLoading } = createUserAction(form, onOpenChange)
+  const availableRoles = useAvailableRoles()
   const onSubmit = (values: UserForm) => {
     mutate(values)
   }
-
   const isPasswordTouched = !!form.formState.dirtyFields.password
 
-  const availableRoles = useAvailableRoles()
+  const fetchManagers = async () => {
+    setIsManagersLoading(true)
+    try {
+      const response = await getManagersList()
+      if (response.status === 'success' && Array.isArray(response.data)) {
+        setManagersData(response.data)
+      } else {
+        console.error('Invalid response structure or empty data')
+      }
+    } catch (error) {
+      console.error('Failed to fetch managers:', error)
+    } finally {
+      setIsManagersLoading(false)
+    }
+  }
+
+  const handleRoleChange = (value: string) => {
+    setSelectedRole(value)
+    form.setValue('managerId', '')
+    if (
+      value === 'user' &&
+      (user?.role === 'super-admin' || user?.role === 'sub-admin')
+    ) {
+      if (!managersFetched) {
+        fetchManagers()
+        setManagersFetched(true)
+      }
+    }
+  }
+
+  useEffect(() => {
+    if (
+      selectedRole === 'user' &&
+      (user?.role === 'super-admin' || user?.role === 'sub-admin') &&
+      !managersFetched
+    ) {
+      fetchManagers()
+    }
+  }, [selectedRole, managersFetched, user?.role])
 
   return (
     <Dialog
@@ -183,6 +239,7 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name='role'
@@ -193,7 +250,10 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
                     </FormLabel>
                     <SelectDropdown
                       defaultValue={field.value}
-                      onValueChange={field.onChange}
+                      onValueChange={(value) => {
+                        field.onChange(value)
+                        handleRoleChange(value)
+                      }}
                       placeholder='Select a role'
                       className='col-span-4'
                       items={availableRoles.map(({ label, value }) => ({
@@ -205,6 +265,40 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
                   </FormItem>
                 )}
               />
+
+              {selectedRole === 'user' &&
+                (user?.role === 'super-admin' ||
+                  user?.role === 'sub-admin') && (
+                  <FormField
+                    control={form.control}
+                    name='managerId'
+                    render={({ field }) => (
+                      <FormItem className='grid grid-cols-6 items-center gap-x-4 gap-y-1 space-y-0'>
+                        <FormLabel className='col-span-2 text-right'>
+                          Manager
+                        </FormLabel>
+                        <FormControl>
+                          {isManagersLoading ? (
+                            <LoadingSpinner size='small' />
+                          ) : (
+                            <SelectDropdown
+                              defaultValue={field.value}
+                              onValueChange={field.onChange}
+                              placeholder='Select a Manager'
+                              className='col-span-4'
+                              items={managersData.map((manager) => ({
+                                label: manager.username,
+                                value: manager._id,
+                              }))}
+                            />
+                          )}
+                        </FormControl>
+                        <FormMessage className='col-span-4 col-start-3' />
+                      </FormItem>
+                    )}
+                  />
+                )}
+
               <FormField
                 control={form.control}
                 name='password'

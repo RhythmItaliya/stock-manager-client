@@ -1,5 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
-import { createUser, deleteUser, updateUser } from '@/api/api.user'
+import {
+  createUser,
+  deleteUser,
+  getManagersList,
+  updateUser,
+} from '@/api/api.user'
 import { getUsers } from '@/api/api.user'
 import { useApi } from '@/hooks/use-api'
 import { toast } from '@/hooks/use-toast'
