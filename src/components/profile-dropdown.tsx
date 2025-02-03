@@ -1,5 +1,4 @@
 import { Link } from '@tanstack/react-router'
-import { logout } from '@/api/api.logout'
 import { useAuthStore } from '@/stores/authStore'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -13,12 +12,11 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { useLogout } from './hook/useLogout'
 
 export function ProfileDropdown() {
   const { user } = useAuthStore((state) => state.auth)
-  const logoutUser = () => {
-    logout()
-  }
+  const { handleLogout } = useLogout()
 
   return (
     <DropdownMenu modal={false}>
@@ -55,7 +53,7 @@ export function ProfileDropdown() {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={logoutUser}>
+        <DropdownMenuItem onClick={handleLogout}>
           Log out
           <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
         </DropdownMenuItem>

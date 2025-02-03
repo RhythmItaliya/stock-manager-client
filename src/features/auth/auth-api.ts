@@ -2,6 +2,7 @@ import Cookies from 'js-cookie'
 import { useNavigate } from '@tanstack/react-router'
 import { jwtDecode } from 'jwt-decode'
 import { loginUser } from '@/api/api.auth'
+import { useSocket } from '@/api/api.socket-context'
 import { useAuthStore } from '@/stores/authStore'
 import { AuthUser } from '@/stores/types'
 import { useApi } from '@/hooks/use-api'
@@ -12,6 +13,7 @@ const ACCESS_TOKEN = 'accessToken'
 export const useAuth = () => {
   const navigate = useNavigate()
   const { setUser, setAccessToken } = useAuthStore((state) => state.auth)
+  const socket = useSocket()
 
   const { mutate: loginApi, isLoading } = useApi({
     apiCall: loginUser,
@@ -33,6 +35,9 @@ export const useAuth = () => {
           title: 'Login successful',
           description: `Welcome back, ${decodedToken.username}!`,
         })
+        if (socket) {
+          socket.emit('user_login', decodedToken.id)
+        }
         navigate({ to: '/' })
       } else {
         toast({
