@@ -120,11 +120,11 @@ export const columns: ColumnDef<User>[] = [
       const userStatus = useUserStatus()
 
       const isOnline = userStatus.get(_id) || false
-      const badgeColor = isOnline ? 'bg-green-100' : 'bg-red-100'
+      const textColor = isOnline ? 'text-green-500' : 'text-red-500'
 
       return (
         <div className='flex space-x-2'>
-          <Badge variant='outline' className={badgeColor}>
+          <Badge variant='secondary' className={textColor}>
             {isOnline ? 'Online' : 'Offline'}
           </Badge>
         </div>
@@ -132,7 +132,7 @@ export const columns: ColumnDef<User>[] = [
     },
     enableSorting: false,
     enableHiding: false,
-  },
+  },  
   {
     accessorKey: 'status',
     header: ({ column }) => (

@@ -24,7 +24,6 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
     newSocket.on('user_status', (data) => {
       const { userId, isOnline } = data
       setUserStatus((prev) => new Map(prev).set(userId, isOnline))
-      console.log(`User ${userId} is ${isOnline ? 'online' : 'offline'}`)
     })
 
     return () => {
