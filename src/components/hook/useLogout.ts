@@ -1,7 +1,7 @@
 // useLogout.ts
 import { useEffect } from 'react'
 import { logout } from '@/api/api.logout'
-import { useSocket } from '@/api/api.socket-context'
+import { useSocket } from '@/context/socket-context'
 
 export const useLogout = () => {
   const socket = useSocket()

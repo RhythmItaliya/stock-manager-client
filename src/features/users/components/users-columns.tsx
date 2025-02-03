@@ -1,5 +1,6 @@
 import { ColumnDef } from '@tanstack/react-table'
 import { cn } from '@/lib/utils'
+import { useUserStatus } from '@/context/socket-context'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import LongText from '@/components/long-text'
@@ -82,28 +83,6 @@ export const columns: ColumnDef<User>[] = [
     ),
   },
   {
-    accessorKey: 'status',
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='Status' />
-    ),
-    cell: ({ row }) => {
-      const { status } = row.original
-      const badgeColor = callTypes.get(status)
-      return (
-        <div className='flex space-x-2'>
-          <Badge variant='outline' className={cn('capitalize', badgeColor)}>
-            {row.getValue('status')}
-          </Badge>
-        </div>
-      )
-    },
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id))
-    },
-    enableHiding: false,
-    enableSorting: false,
-  },
-  {
     accessorKey: 'role',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Role' />
@@ -130,6 +109,51 @@ export const columns: ColumnDef<User>[] = [
     },
     enableSorting: false,
     enableHiding: false,
+  },
+  {
+    accessorKey: 'activity',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title='Activity' />
+    ),
+    cell: ({ row }) => {
+      const { _id } = row.original
+      const userStatus = useUserStatus()
+
+      const isOnline = userStatus.get(_id) || false
+      const badgeColor = isOnline ? 'bg-green-100' : 'bg-red-100'
+
+      return (
+        <div className='flex space-x-2'>
+          <Badge variant='outline' className={badgeColor}>
+            {isOnline ? 'Online' : 'Offline'}
+          </Badge>
+        </div>
+      )
+    },
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
+    accessorKey: 'status',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title='Status' />
+    ),
+    cell: ({ row }) => {
+      const { status } = row.original
+      const badgeColor = callTypes.get(status)
+      return (
+        <div className='flex space-x-2'>
+          <Badge variant='outline' className={cn('capitalize', badgeColor)}>
+            {row.getValue('status')}
+          </Badge>
+        </div>
+      )
+    },
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id))
+    },
+    enableHiding: false,
+    enableSorting: false,
   },
   {
     id: 'actions',
