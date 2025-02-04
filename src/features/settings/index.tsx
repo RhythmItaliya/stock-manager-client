@@ -6,6 +6,7 @@ import {
   IconTool,
   IconUser,
   IconFileUpload,
+  IconLink,
 } from '@tabler/icons-react'
 import { Separator } from '@/components/ui/separator'
 import { Header } from '@/components/layout/header'
@@ -80,5 +81,10 @@ const sidebarNavItems = [
     title: 'CSV Upload',
     icon: <IconFileUpload size={18} />,
     href: '/settings/csv-upload',
+  },
+  {
+    title: 'Link Generate',
+    icon: <IconLink size={18} />,
+    href: '/settings/link-generate',
   },
 ]

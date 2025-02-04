@@ -16,6 +16,7 @@ import {
   IconUsers,
   IconBuildingBank,
   IconFileUpload,
+  IconLink,
 } from '@tabler/icons-react'
 import { AudioWaveform, Command, GalleryVerticalEnd } from 'lucide-react'
 import { type SidebarData } from '../types'
@@ -173,6 +174,11 @@ export const sidebarData: SidebarData = {
               title: 'CSV Upload',
               url: '/settings/csv-upload',
               icon: IconFileUpload,
+            },
+            {
+              title: 'Link Generate',
+              url: '/settings/link-generator',
+              icon: IconLink,
             },
           ],
         },

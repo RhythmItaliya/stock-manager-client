@@ -58,6 +58,9 @@ const AuthenticatedAppsIndexLazyImport = createFileRoute(
 const AuthenticatedSettingsNotificationsLazyImport = createFileRoute(
   '/_authenticated/settings/notifications',
 )()
+const AuthenticatedSettingsLinkGeneratorLazyImport = createFileRoute(
+  '/_authenticated/settings/link-generator',
+)()
 const AuthenticatedSettingsDisplayLazyImport = createFileRoute(
   '/_authenticated/settings/display',
 )()
@@ -256,6 +259,17 @@ const AuthenticatedSettingsNotificationsLazyRoute =
     ),
   )
 
+const AuthenticatedSettingsLinkGeneratorLazyRoute =
+  AuthenticatedSettingsLinkGeneratorLazyImport.update({
+    id: '/link-generator',
+    path: '/link-generator',
+    getParentRoute: () => AuthenticatedSettingsRouteLazyRoute,
+  } as any).lazy(() =>
+    import('./routes/_authenticated/settings/link-generator.lazy').then(
+      (d) => d.Route,
+    ),
+  )
+
 const AuthenticatedSettingsDisplayLazyRoute =
   AuthenticatedSettingsDisplayLazyImport.update({
     id: '/display',
@@ -430,6 +444,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsDisplayLazyImport
       parentRoute: typeof AuthenticatedSettingsRouteLazyImport
     }
+    '/_authenticated/settings/link-generator': {
+      id: '/_authenticated/settings/link-generator'
+      path: '/link-generator'
+      fullPath: '/settings/link-generator'
+      preLoaderRoute: typeof AuthenticatedSettingsLinkGeneratorLazyImport
+      parentRoute: typeof AuthenticatedSettingsRouteLazyImport
+    }
     '/_authenticated/settings/notifications': {
       id: '/_authenticated/settings/notifications'
       path: '/notifications'
@@ -496,6 +517,7 @@ interface AuthenticatedSettingsRouteLazyRouteChildren {
   AuthenticatedSettingsAppearanceLazyRoute: typeof AuthenticatedSettingsAppearanceLazyRoute
   AuthenticatedSettingsCsvUploadLazyRoute: typeof AuthenticatedSettingsCsvUploadLazyRoute
   AuthenticatedSettingsDisplayLazyRoute: typeof AuthenticatedSettingsDisplayLazyRoute
+  AuthenticatedSettingsLinkGeneratorLazyRoute: typeof AuthenticatedSettingsLinkGeneratorLazyRoute
   AuthenticatedSettingsNotificationsLazyRoute: typeof AuthenticatedSettingsNotificationsLazyRoute
   AuthenticatedSettingsIndexLazyRoute: typeof AuthenticatedSettingsIndexLazyRoute
 }
@@ -510,6 +532,8 @@ const AuthenticatedSettingsRouteLazyRouteChildren: AuthenticatedSettingsRouteLaz
       AuthenticatedSettingsCsvUploadLazyRoute,
     AuthenticatedSettingsDisplayLazyRoute:
       AuthenticatedSettingsDisplayLazyRoute,
+    AuthenticatedSettingsLinkGeneratorLazyRoute:
+      AuthenticatedSettingsLinkGeneratorLazyRoute,
     AuthenticatedSettingsNotificationsLazyRoute:
       AuthenticatedSettingsNotificationsLazyRoute,
     AuthenticatedSettingsIndexLazyRoute: AuthenticatedSettingsIndexLazyRoute,
@@ -565,6 +589,7 @@ export interface FileRoutesByFullPath {
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceLazyRoute
   '/settings/csv-upload': typeof AuthenticatedSettingsCsvUploadLazyRoute
   '/settings/display': typeof AuthenticatedSettingsDisplayLazyRoute
+  '/settings/link-generator': typeof AuthenticatedSettingsLinkGeneratorLazyRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsLazyRoute
   '/apps': typeof AuthenticatedAppsIndexLazyRoute
   '/chats': typeof AuthenticatedChatsIndexLazyRoute
@@ -591,6 +616,7 @@ export interface FileRoutesByTo {
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceLazyRoute
   '/settings/csv-upload': typeof AuthenticatedSettingsCsvUploadLazyRoute
   '/settings/display': typeof AuthenticatedSettingsDisplayLazyRoute
+  '/settings/link-generator': typeof AuthenticatedSettingsLinkGeneratorLazyRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsLazyRoute
   '/apps': typeof AuthenticatedAppsIndexLazyRoute
   '/chats': typeof AuthenticatedChatsIndexLazyRoute
@@ -621,6 +647,7 @@ export interface FileRoutesById {
   '/_authenticated/settings/appearance': typeof AuthenticatedSettingsAppearanceLazyRoute
   '/_authenticated/settings/csv-upload': typeof AuthenticatedSettingsCsvUploadLazyRoute
   '/_authenticated/settings/display': typeof AuthenticatedSettingsDisplayLazyRoute
+  '/_authenticated/settings/link-generator': typeof AuthenticatedSettingsLinkGeneratorLazyRoute
   '/_authenticated/settings/notifications': typeof AuthenticatedSettingsNotificationsLazyRoute
   '/_authenticated/apps/': typeof AuthenticatedAppsIndexLazyRoute
   '/_authenticated/chats/': typeof AuthenticatedChatsIndexLazyRoute
@@ -651,6 +678,7 @@ export interface FileRouteTypes {
     | '/settings/appearance'
     | '/settings/csv-upload'
     | '/settings/display'
+    | '/settings/link-generator'
     | '/settings/notifications'
     | '/apps'
     | '/chats'
@@ -676,6 +704,7 @@ export interface FileRouteTypes {
     | '/settings/appearance'
     | '/settings/csv-upload'
     | '/settings/display'
+    | '/settings/link-generator'
     | '/settings/notifications'
     | '/apps'
     | '/chats'
@@ -704,6 +733,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings/appearance'
     | '/_authenticated/settings/csv-upload'
     | '/_authenticated/settings/display'
+    | '/_authenticated/settings/link-generator'
     | '/_authenticated/settings/notifications'
     | '/_authenticated/apps/'
     | '/_authenticated/chats/'
@@ -799,6 +829,7 @@ export const routeTree = rootRoute
         "/_authenticated/settings/appearance",
         "/_authenticated/settings/csv-upload",
         "/_authenticated/settings/display",
+        "/_authenticated/settings/link-generator",
         "/_authenticated/settings/notifications",
         "/_authenticated/settings/"
       ]
@@ -845,6 +876,10 @@ export const routeTree = rootRoute
     },
     "/_authenticated/settings/display": {
       "filePath": "_authenticated/settings/display.lazy.tsx",
+      "parent": "/_authenticated/settings"
+    },
+    "/_authenticated/settings/link-generator": {
+      "filePath": "_authenticated/settings/link-generator.lazy.tsx",
       "parent": "/_authenticated/settings"
     },
     "/_authenticated/settings/notifications": {

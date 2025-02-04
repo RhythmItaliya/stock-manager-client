@@ -132,7 +132,7 @@ export const columns: ColumnDef<User>[] = [
     },
     enableSorting: false,
     enableHiding: false,
-  },  
+  },
   {
     accessorKey: 'status',
     header: ({ column }) => (
