@@ -75,10 +75,12 @@ export const updateUser = async (
     email?: string
     role?: string
     status?: string
+    managerId?: string
   }
 ) => {
   const token = getAuthToken()
   try {
+    console.log('userData', userData)
     const response = await ApiConfig.put(`/users/${userId}`, userData, {
       headers: {
         Authorization: `Bearer ${token}`,

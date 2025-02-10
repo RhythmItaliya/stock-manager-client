@@ -30,7 +30,7 @@ import { PasswordInput } from '@/components/password-input'
 import { SelectDropdown } from '@/components/select-dropdown'
 import { User } from '../data/schema'
 import { useAvailableRoles } from '../utility/useAvailableRoles'
-import { createUserAction } from './hook/use-users-action'
+import { createUserAction, updateUserAction } from './hook/use-users-action'
 
 const formSchema = z
   .object({
@@ -107,21 +107,21 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
     resolver: zodResolver(formSchema),
     defaultValues: isEdit
       ? {
-          ...currentRow,
-          password: '',
-          confirmPassword: '',
-          isEdit,
-          managerId: currentRow?.managerId || '',
-        }
+        ...currentRow,
+        password: '',
+        confirmPassword: '',
+        isEdit,
+        managerId: currentRow?.managerId || '',
+      }
       : {
-          username: '',
-          email: '',
-          role: '',
-          password: '',
-          confirmPassword: '',
-          isEdit,
-          managerId: '',
-        },
+        username: '',
+        email: '',
+        role: '',
+        password: '',
+        confirmPassword: '',
+        isEdit,
+        managerId: '',
+      },
   })
 
   const { user } = useAuthStore((state) => state.auth)
@@ -131,10 +131,18 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
   const [isManagersLoading, setIsManagersLoading] = useState(false)
   const [managersFetched, setManagersFetched] = useState(false)
 
-  const { mutate, isLoading } = createUserAction(form, onOpenChange)
+  const { mutate: createMutate, isLoading: createUserLoading } = createUserAction(form, onOpenChange)
+  const { mutate: updateMutate, loading: updateUserLoading } = updateUserAction(currentRow?._id || '', form, onOpenChange)
+
+  const isLoading = updateUserLoading || createUserLoading
+
   const availableRoles = useAvailableRoles()
   const onSubmit = (values: UserForm) => {
-    mutate(values)
+    if (isEdit) {
+      updateMutate(values)
+    } else {
+      createMutate(values)
+    }
   }
   const isPasswordTouched = !!form.formState.dirtyFields.password
 

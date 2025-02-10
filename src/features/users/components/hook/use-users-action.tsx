@@ -91,7 +91,7 @@ export function deleteUserAction(
     method: 'DELETE',
   })
 
-  return { mutate, isLoading }
+  return { mutate, loading: isLoading }
 }
 
 export function updateUserAction(
@@ -123,5 +123,5 @@ export function updateUserAction(
     method: 'PUT',
   })
 
-  return { mutate, isLoading }
+  return { mutate, loading: isLoading }
 }

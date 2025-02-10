@@ -41,6 +41,28 @@ export const columns: ColumnDef<User>[] = [
     enableHiding: false,
   },
   {
+    id: 'activity',
+    cell: ({ row }) => {
+      const { _id } = row.original
+      const userStatus = useUserStatus()
+      const isOnline = userStatus.get(_id) || false
+      const statusColor = isOnline ? 'bg-green-400' : 'bg-red-400'
+      return (
+        <div className='flex justify-center items-center h-full'>
+          <span className={`w-3 h-3 rounded-full ${statusColor}`} />
+        </div>
+      )
+    },
+    meta: {
+      className: cn(
+        'sticky md:table-cell left-0 z-10 rounded-tl text-center',
+        'bg-background transition-colors duration-200 group-hover/row:bg-muted group-data-[state=selected]/row:bg-muted'
+      ),
+    },
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
     accessorKey: 'username',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Username' />
@@ -90,11 +112,7 @@ export const columns: ColumnDef<User>[] = [
     cell: ({ row }) => {
       const { role } = row.original
       const userType = userTypes.find(({ value }) => value === role)
-
-      if (!userType) {
-        return null
-      }
-
+      if (!userType) return null
       return (
         <div className='flex gap-x-2 items-center'>
           {userType.icon && (
@@ -106,29 +124,6 @@ export const columns: ColumnDef<User>[] = [
     },
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id))
-    },
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: 'activity',
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='Activity' />
-    ),
-    cell: ({ row }) => {
-      const { _id } = row.original
-      const userStatus = useUserStatus()
-
-      const isOnline = userStatus.get(_id) || false
-      const textColor = isOnline ? 'text-green-500' : 'text-red-500'
-
-      return (
-        <div className='flex space-x-2'>
-          <Badge variant='secondary' className={textColor}>
-            {isOnline ? 'Online' : 'Offline'}
-          </Badge>
-        </div>
-      )
     },
     enableSorting: false,
     enableHiding: false,
