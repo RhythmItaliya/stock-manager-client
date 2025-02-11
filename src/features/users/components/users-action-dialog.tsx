@@ -138,6 +138,7 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
 
   const availableRoles = useAvailableRoles()
   const onSubmit = (values: UserForm) => {
+    console.log("UserForm", values);
     if (isEdit) {
       updateMutate(values)
     } else {

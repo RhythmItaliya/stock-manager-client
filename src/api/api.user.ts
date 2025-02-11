@@ -80,7 +80,6 @@ export const updateUser = async (
 ) => {
   const token = getAuthToken()
   try {
-    console.log('userData', userData)
     const response = await ApiConfig.put(`/users/${userId}`, userData, {
       headers: {
         Authorization: `Bearer ${token}`,
