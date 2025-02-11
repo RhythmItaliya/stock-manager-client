@@ -19,10 +19,7 @@ interface Props {
 export function UsersDeleteDialog({ open, onOpenChange, currentRow }: Props) {
   const [value, setValue] = useState('')
   const userId = currentRow._id
-  const { mutate: deleteUser, isLoading } = deleteUserAction(
-    userId,
-    onOpenChange
-  )
+  const { mutate: deleteUser, loading } = deleteUserAction(userId, onOpenChange)
 
   const handleDelete = () => {
     if (value.trim() !== currentRow.username || !userId) return
@@ -84,7 +81,7 @@ export function UsersDeleteDialog({ open, onOpenChange, currentRow }: Props) {
           </Alert>
         </div>
       }
-      confirmText={isLoading ? 'Deleting...' : 'Delete'}
+      confirmText={loading ? 'Deleting...' : 'Delete'}
       destructive
     />
   )

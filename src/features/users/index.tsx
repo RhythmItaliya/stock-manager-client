@@ -22,7 +22,6 @@ export default function Users() {
           <ProfileDropdown />
         </div>
       </Header>
-
       <Main>
         <div className='mb-2 flex items-center justify-between space-y-2 flex-wrap'>
           <div>
@@ -37,7 +36,6 @@ export default function Users() {
           <UsersTable data={usersData} columns={columns} loading={isLoading} />
         </div>
       </Main>
-
       <UsersDialogs />
     </UsersProvider>
   )

@@ -107,21 +107,21 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
     resolver: zodResolver(formSchema),
     defaultValues: isEdit
       ? {
-        ...currentRow,
-        password: '',
-        confirmPassword: '',
-        isEdit,
-        managerId: currentRow?.managerId || '',
-      }
+          ...currentRow,
+          password: '',
+          confirmPassword: '',
+          isEdit,
+          managerId: currentRow?.managerId || '',
+        }
       : {
-        username: '',
-        email: '',
-        role: '',
-        password: '',
-        confirmPassword: '',
-        isEdit,
-        managerId: '',
-      },
+          username: '',
+          email: '',
+          role: '',
+          password: '',
+          confirmPassword: '',
+          isEdit,
+          managerId: '',
+        },
   })
 
   const { user } = useAuthStore((state) => state.auth)
@@ -131,14 +131,19 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
   const [isManagersLoading, setIsManagersLoading] = useState(false)
   const [managersFetched, setManagersFetched] = useState(false)
 
-  const { mutate: createMutate, isLoading: createUserLoading } = createUserAction(form, onOpenChange)
-  const { mutate: updateMutate, loading: updateUserLoading } = updateUserAction(currentRow?._id || '', form, onOpenChange)
+  const { mutate: createMutate, isLoading: createUserLoading } =
+    createUserAction(form, onOpenChange)
+  const { mutate: updateMutate, loading: updateUserLoading } = updateUserAction(
+    currentRow?._id || '',
+    form,
+    onOpenChange
+  )
 
   const isLoading = updateUserLoading || createUserLoading
 
   const availableRoles = useAvailableRoles()
   const onSubmit = (values: UserForm) => {
-    console.log("UserForm", values);
+    console.log('UserForm', values)
     if (isEdit) {
       updateMutate(values)
     } else {

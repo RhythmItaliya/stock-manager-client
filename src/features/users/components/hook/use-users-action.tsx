@@ -3,11 +3,11 @@ import { createUser, deleteUser, updateUser } from '@/api/api.user'
 import { getUsers } from '@/api/api.user'
 import { useApi } from '@/hooks/use-api'
 import { toast } from '@/hooks/use-toast'
+import { useUsers } from '../../context/users-context'
 
 export function getUsersAction() {
   const [usersData, setUsersData] = useState<any[]>([])
   const hasFetchedRef = useRef(false)
-
   const { isLoading, mutate } = useApi({
     apiCall: getUsers,
     method: 'GET',
@@ -35,6 +35,7 @@ export function createUserAction(
   form: any,
   onOpenChange: (open: boolean) => void
 ) {
+  const { setUsersData } = useUsers()
   const { mutate, isLoading } = useApi({
     apiCall: createUser,
     onSuccess: (data) => {
@@ -47,6 +48,7 @@ export function createUserAction(
         ),
       })
       form.reset()
+      setUsersData((prevUsersData) => [...prevUsersData, data.data])
       onOpenChange(false)
     },
     onError: (error: any) => {
@@ -63,42 +65,12 @@ export function createUserAction(
   return { mutate, isLoading }
 }
 
-export function deleteUserAction(
-  userId: string,
-  onOpenChange: (open: boolean) => void
-) {
-  const { mutate, isLoading } = useApi({
-    apiCall: () => deleteUser(userId),
-    onSuccess: (data) => {
-      toast({
-        title: 'User Deleted Successfully',
-        description: (
-          <pre className='mt-2 w-[340px] rounded-md bg-slate-950 p-4'>
-            <code className='text-white'>{JSON.stringify(data, null, 2)}</code>
-          </pre>
-        ),
-      })
-      onOpenChange(false)
-    },
-    onError: (error: any) => {
-      console.error('Error deleting user:', error)
-      toast({
-        title: 'Error',
-        description: `Error deleting the user: ${error.message}`,
-        variant: 'destructive',
-      })
-    },
-    method: 'DELETE',
-  })
-
-  return { mutate, loading: isLoading }
-}
-
 export function updateUserAction(
   userId: string,
   updatedUserData: any,
   onOpenChange: (open: boolean) => void
 ) {
+  const { setUsersData } = useUsers()
   const { mutate, isLoading } = useApi({
     apiCall: () => updateUser(userId, updatedUserData),
     onSuccess: (data) => {
@@ -110,6 +82,11 @@ export function updateUserAction(
           </pre>
         ),
       })
+      setUsersData((prevUsersData) =>
+        prevUsersData.map((user) =>
+          user._id === userId ? { ...user, ...data.data } : user
+        )
+      )
       onOpenChange(false)
     },
     onError: (error: any) => {
@@ -121,6 +98,41 @@ export function updateUserAction(
       })
     },
     method: 'PUT',
+  })
+
+  return { mutate, loading: isLoading }
+}
+
+export function deleteUserAction(
+  userId: string,
+  onOpenChange: (open: boolean) => void
+) {
+  const { setUsersData } = useUsers()
+  const { mutate, isLoading } = useApi({
+    apiCall: () => deleteUser(userId),
+    onSuccess: (data) => {
+      toast({
+        title: 'User Deleted Successfully',
+        description: (
+          <pre className='mt-2 w-[340px] rounded-md bg-slate-950 p-4'>
+            <code className='text-white'>{JSON.stringify(data, null, 2)}</code>
+          </pre>
+        ),
+      })
+      setUsersData((prevUsersData) =>
+        prevUsersData.filter((user) => user._id !== userId)
+      )
+      onOpenChange(false)
+    },
+    onError: (error: any) => {
+      console.error('Error deleting user:', error)
+      toast({
+        title: 'Error',
+        description: `Error deleting the user: ${error.message}`,
+        variant: 'destructive',
+      })
+    },
+    method: 'DELETE',
   })
 
   return { mutate, loading: isLoading }

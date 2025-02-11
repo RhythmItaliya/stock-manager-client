@@ -9,6 +9,8 @@ interface UsersContextType {
   setOpen: (str: UsersDialogType | null) => void
   currentRow: User | null
   setCurrentRow: React.Dispatch<React.SetStateAction<User | null>>
+  usersData: User[]
+  setUsersData: React.Dispatch<React.SetStateAction<User[]>>
 }
 
 const UsersContext = React.createContext<UsersContextType | null>(null)
@@ -20,9 +22,19 @@ interface Props {
 export default function UsersProvider({ children }: Props) {
   const [open, setOpen] = useDialogState<UsersDialogType>(null)
   const [currentRow, setCurrentRow] = useState<User | null>(null)
+  const [usersData, setUsersData] = useState<User[]>([])
 
   return (
-    <UsersContext value={{ open, setOpen, currentRow, setCurrentRow }}>
+    <UsersContext
+      value={{
+        open,
+        setOpen,
+        currentRow,
+        setCurrentRow,
+        usersData,
+        setUsersData,
+      }}
+    >
       {children}
     </UsersContext>
   )
