@@ -66,7 +66,7 @@ export const deleteUser = async (userId: string) => {
 /**
  * Update User - Update a user's details by ID
  * @param userId - The ID of the user to update
- * @param userData - The updated user data (username, email, role, status, etc.)
+ * @param userData - The updated user data (username, email, role, password, etc.)
  */
 export const updateUser = async (
   userId: string,
@@ -74,8 +74,8 @@ export const updateUser = async (
     username?: string
     email?: string
     role?: string
-    status?: string
     managerId?: string
+    password?: string
   }
 ) => {
   const token = getAuthToken()
