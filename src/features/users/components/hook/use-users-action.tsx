@@ -1,3 +1,5 @@
+// changed file
+
 import { useState, useEffect, useRef } from 'react'
 import { createUser, deleteUser, updateUser } from '@/api/api.user'
 import { getUsers } from '@/api/api.user'
@@ -97,7 +99,7 @@ export function updateUserAction(
         variant: 'destructive',
       })
     },
-    method: 'PUT',
+    method: 'PATCH',
   })
 
   return { mutate, loading: isLoading }

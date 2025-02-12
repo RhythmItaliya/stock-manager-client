@@ -1,3 +1,4 @@
+// changed file
 'use client'
 
 import { useEffect, useState } from 'react'
@@ -126,16 +127,18 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
 
   const { user } = useAuthStore((state) => state.auth)
 
-  const [selectedRole, setSelectedRole] = useState('')
+  const [selectedRole, setSelectedRole] = useState(form.getValues('role'))
+
   const [managersData, setManagersData] = useState<Manager[]>([])
   const [isManagersLoading, setIsManagersLoading] = useState(false)
   const [managersFetched, setManagersFetched] = useState(false)
 
   const { mutate: createMutate, isLoading: createUserLoading } =
     createUserAction(form, onOpenChange)
+  const [updatedUser, setUpdatedUser] = useState<Partial<UserForm> | null>(null)
   const { mutate: updateMutate, loading: updateUserLoading } = updateUserAction(
     currentRow?._id || '',
-    form,
+    updatedUser,
     onOpenChange
   )
 
@@ -144,7 +147,23 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
   const availableRoles = useAvailableRoles()
   const onSubmit = (values: UserForm) => {
     console.log('UserForm', values)
+
+    const finalPayload: Partial<UserForm> = {
+      username: values.username,
+      email: values.email,
+      role: values.role,
+    }
+
+    if (values.role === 'user') {
+      finalPayload.managerId = values.managerId
+    }
+
+    if (values.password) {
+      finalPayload.password = values.password
+      finalPayload.confirmPassword = values.confirmPassword
+    }
     if (isEdit) {
+      setUpdatedUser(finalPayload)
       updateMutate(values)
     } else {
       createMutate(values)

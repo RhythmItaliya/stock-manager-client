@@ -1,3 +1,4 @@
+// changed file
 import { useState } from 'react'
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { toast } from '@/hooks/use-toast'
@@ -8,7 +9,7 @@ interface UseApiProps<TData, TVariables> {
   onError?: (error: unknown) => void
   onSubmit?: (variables: TVariables) => void
   options?: UseMutationOptions<TData, unknown, TVariables, unknown>
-  method?: 'GET' | 'POST' | 'PUT' | 'DELETE'
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
 }
 
 export function useApi<TData, TVariables>({
