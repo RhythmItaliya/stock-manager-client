@@ -24,6 +24,7 @@ export function NavUser() {
   const { isMobile } = useSidebar()
 
   const logoutUser = () => {
+    // @ts-ingore 
     logout()
   }
 

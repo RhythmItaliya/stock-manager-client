@@ -45,7 +45,7 @@ export const useMarketFeed = () => {
   }, [])
 
   useEffect(() => {
-    marketApi.connect('http://localhost:3000')
+    marketApi.connect('https://stock-manager-server.onrender.com')
     marketApi.subscribe(handleMarketData)
 
     return () => {

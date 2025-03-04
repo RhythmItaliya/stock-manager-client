@@ -2,7 +2,7 @@
 import Cookies from 'js-cookie'
 import { ApiConfig, getAuthToken, getUserId } from './api.config'
 
-export const logout = async (socket: any) => {
+export const logout = async (socket?: any) => {
   const userId = getUserId() || ''
   const token = getAuthToken()
   const socketId = socket?.id

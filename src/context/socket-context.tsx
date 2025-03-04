@@ -19,7 +19,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
   const [userStatus, setUserStatus] = useState<Map<string, boolean>>(new Map())
 
   useEffect(() => {
-    const newSocket = io('http://localhost:3000')
+    const newSocket = io('https://stock-manager-server.onrender.com')
     setSocket(newSocket)
     newSocket.on('user_status', (data) => {
       const { userId, isOnline } = data

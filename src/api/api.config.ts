@@ -4,7 +4,7 @@ import Cookies from 'js-cookie'
 import { useAuthStore } from '@/stores/authStore'
 
 export const ApiConfig = axios.create({
-  baseURL: 'http://localhost:3000/api',
+  baseURL: 'https://stock-manager-server.onrender.com/api',
   headers: {
     'Content-Type': 'application/json',
   },
